@@ -41,7 +41,7 @@ const initParticles = (width: number, height: number) => {
     }));
 };
 
-  const drawParticle = (
+    const drawParticle = (
         ctx: CanvasRenderingContext2D,
         particle: Particle,
         season: Season
@@ -102,52 +102,57 @@ const initParticles = (width: number, height: number) => {
             console.log("Animation stopped - missing canvas or context");
             return;
         }
+        
+        ctx.moveTo(0, 0);
+        ctx.lineTo(200, 100);
+        ctx.stroke();
+        ctx.font = "30px Arial";
+        ctx.fillText("Hello World", 10, 50);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        particles.current.forEach(particle => {
-        particle.y += particle.speed;
-        particle.x += Math.sin(particle.y / 50) * 0.5; 
-        particle.rotation += particle.rotationSpeed;
+        // particles.current.forEach(particle => {
+        // particle.y += particle.speed;
+        // particle.x += Math.sin(particle.y / 50) * 0.5; 
+        // particle.rotation += particle.rotationSpeed;
 
-        if (particle.y > canvas.height) {
-            particle.y = -10;
-            particle.x = Math.random() * canvas.width;
-            particle.opacity = 0.3 + Math.random() * 0.7;
-        }
+        // if (particle.y > canvas.height) {
+        //     particle.y = -10;
+        //     particle.x = Math.random() * canvas.width;
+        //     particle.opacity = 0.3 + Math.random() * 0.7;
+        // }
 
-        drawParticle(ctx, particle, season);
-        });
+        // drawParticle(ctx, particle, season);
+        // });
 
         animationFrameId.current = requestAnimationFrame(animate);
     };
 
     useEffect(() => {
-        if (season === Season.WINTER && imageRef.current === undefined) {
-            console.log("Making snow image")
-            const img = new Image();
-            img.src = '/snow.png';
-            img.onload = () => {
-                imageRef.current = img;
-            };
-        }
-
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        const ctx = canvas?.getContext('2d');
+        let isActive = true; 
+    
+        const animate = () => {
+            if (!isActive) return;
+            
+            console.log("hi chat");
+            animationFrameId.current = requestAnimationFrame(animate);
+        };
 
         const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initParticles(canvas.width, canvas.height);
+            canvas!.width = window.innerWidth;
+            canvas!.height = window.innerHeight;
+            initParticles(canvas!.width, canvas!.height);
         };
 
         resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
+    
         animate();
-
+    
         return () => {
-            window.removeEventListener('resize', resizeCanvas);
+            console.log('Cleaning up animation');
+            isActive = false;
             if (animationFrameId.current) {
                 cancelAnimationFrame(animationFrameId.current);
             }
@@ -161,6 +166,6 @@ const initParticles = (width: number, height: number) => {
         style={{ touchAction: 'none' }}
         />
     );
-    };
+};
 
-    export default SeasonalEffects;
+export default SeasonalEffects;
