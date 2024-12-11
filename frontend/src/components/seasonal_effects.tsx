@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 type Particle = {
     x: number;
@@ -28,6 +28,8 @@ const canvasRef = useRef<HTMLCanvasElement>(null);
 const particles = useRef<Particle[]>([]);
 const imageRef = useRef<HTMLImageElement | undefined>(undefined)
 const animationFrameId = useRef<number | undefined>(undefined)
+const [y, setY] = useState(0);
+const yRef = useRef<number>(0);
 
 const initParticles = (width: number, height: number) => {
     particles.current = Array.from({ length: particleCount }, () => ({
@@ -40,7 +42,6 @@ const initParticles = (width: number, height: number) => {
     opacity: 0.3 + Math.random() * 0.7
     }));
 };
-
     const drawParticle = (
         ctx: CanvasRenderingContext2D,
         particle: Particle,
@@ -92,64 +93,51 @@ const initParticles = (width: number, height: number) => {
         ctx.restore();
     };
 
-    const animate = () => {
-        console.log("hi chat")
-        const canvas = canvasRef.current;
-        const ctx = canvas?.getContext('2d');
-
-        if (!canvas || !ctx) 
-        {
-            console.log("Animation stopped - missing canvas or context");
-            return;
-        }
-        
-        ctx.moveTo(0, 0);
-        ctx.lineTo(200, 100);
-        ctx.stroke();
-        ctx.font = "30px Arial";
-        ctx.fillText("Hello World", 10, 50);
-
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // particles.current.forEach(particle => {
-        // particle.y += particle.speed;
-        // particle.x += Math.sin(particle.y / 50) * 0.5; 
-        // particle.rotation += particle.rotationSpeed;
-
-        // if (particle.y > canvas.height) {
-        //     particle.y = -10;
-        //     particle.x = Math.random() * canvas.width;
-        //     particle.opacity = 0.3 + Math.random() * 0.7;
-        // }
-
-        // drawParticle(ctx, particle, season);
-        // });
-
-        animationFrameId.current = requestAnimationFrame(animate);
-    };
-
     useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas?.getContext('2d');
+        const canvas = canvasRef.current!;
+        const ctx = canvas?.getContext('2d')!;
         let isActive = true; 
-    
         const animate = () => {
             if (!isActive) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            yRef.current += 2;
+            ctx.moveTo(0, 0);
+            ctx.lineTo(200, Math.sin(yRef.current) * 90 + 90);
+            ctx.stroke();
+            ctx.font = "30px Arial";
+            ctx.fillText("" + (Math.random() * 500).toFixed(0), 10, 50);
+            ctx.fillText("y: " + yRef.current, 10, 90);
+
+            // particles.current.forEach(particle => {
+            // particle.y += particle.speed;
+            // particle.x += Math.sin(particle.y / 50) * 0.5; 
+            // particle.rotation += particle.rotationSpeed;
+
+            // if (particle.y > canvas.height) {
+            //     particle.y = -10;
+            //     particle.x = Math.random() * canvas.width;
+            //     particle.opacity = 0.3 + Math.random() * 0.7;
+            // }
+
+            // drawParticle(ctx, particle, season);
+            // });
             
             console.log("hi chat");
             animationFrameId.current = requestAnimationFrame(animate);
         };
-
+        
         const resizeCanvas = () => {
             canvas!.width = window.innerWidth;
             canvas!.height = window.innerHeight;
             initParticles(canvas!.width, canvas!.height);
         };
-
+        
         resizeCanvas();
-    
+        
         animate();
-    
+        
         return () => {
             console.log('Cleaning up animation');
             isActive = false;
