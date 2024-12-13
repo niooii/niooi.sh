@@ -8,7 +8,8 @@ export default function Home() {
     <div className="min-h-screen bg-gray-900">
       {/* <Counter></Counter> */}
       {/* <AnimationTest></AnimationTest> */}
-      <Winter></Winter>
+      <Winter spawnRate={5}></Winter>
+      <h1>MOVE MOUSE</h1>
     </div>
   );
 }
