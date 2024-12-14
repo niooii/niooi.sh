@@ -5,7 +5,7 @@ import Winter from "@/components/seasonal_deco/winter";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black">
       {/* <Counter></Counter> */}
       {/* <AnimationTest></AnimationTest> */}
       <Winter spawnRate={5}></Winter>
