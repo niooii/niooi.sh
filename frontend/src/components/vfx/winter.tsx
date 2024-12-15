@@ -4,31 +4,34 @@ import React, { RefObject, useEffect, useRef, useState } from 'react';
 const vertSrc = `#version 300 es
 in vec4 pos;
 in vec2 texCoord;
-// x, y, rotation
-in vec3 instancePosition;  
-// size, opacity
-in vec2 instanceScale;     
+
+// instance vars (per snow particle)
+in vec2 ipos;
+in float irotation;
+in float iscale;
+in float iopacity;
+
 uniform vec2 canvasDimensions;
 
 out vec2 vTexCoord;
 out float vOpacity;
 
 void main() {
-    float cosR = cos(instancePosition.z);
-    float sinR = sin(instancePosition.z);
+    float cosR = -cos(irotation);
+    float sinR = sin(irotation);
     
     mat2 rotation = mat2(
         cosR, -sinR,
         sinR, cosR
     );
     
-    vec2 transformedPos = rotation * (pos.xy * instanceScale.x) + instancePosition.xy;
+    vec2 transformedPos = rotation * (pos.xy * iscale) + ipos;
     
     vec2 clipSpace = (transformedPos / canvasDimensions) * 2.0 - 1.0;
     
     gl_Position = vec4(clipSpace.x, -clipSpace.y, 0.0, 1.0);
     vTexCoord = texCoord;
-    vOpacity = instanceScale.y;
+    vOpacity = iopacity;
 }
 `;
  
@@ -43,7 +46,8 @@ in float vOpacity;
 out vec4 outColor;
 
 void main() {
-    vec4 texColor = texture(uTexture, vTexCoord);
+    // make snow texture white
+    vec4 texColor = texture(uTexture, vTexCoord) * 2.0;
     outColor = vec4(texColor.rgb, texColor.a * vOpacity);
 }
 `;
@@ -64,8 +68,8 @@ class SnowParticle {
         this.size = options.size || 0.3 + Math.random() * 0.7;
         this.y = (-img.current!.height + img.current!.height/2) * this.size;
         this.rotation = options.rotation || Math.random() * Math.PI * 2;
-        this.xSpeed = options.xSpeed || (Math.random() * 2 - 1);
-        this.opacity = options.opacity || Math.random() * 0.2 + 0.1;
+        this.xSpeed = options.xSpeed || (Math.random() - 0.5);
+        this.opacity = options.opacity || Math.random() * 0.1 + 0.05;
         this.img = img;
     }
 
@@ -77,9 +81,13 @@ class SnowParticle {
     public update(deltaTime: number) {
         // all snowflakes fall down at constant rate
         this.y += deltaTime * 75;
-        // snowflakes will move left or right proportional to their rotation
+        // snowflakes will move left or right proportional to the mouse movement
         this.x += this.xSpeed * deltaTime * 50;
-        this.rotation += this.xSpeed * deltaTime;
+        // TODO! FIND BETTER FUNCTION that feels better
+        const f = (x: number) => {
+            return x * 1.5;
+        };
+        this.rotation += f(this.xSpeed) * deltaTime;
     }
 }
 
@@ -97,7 +105,6 @@ const Winter = ({ spawnRate }: WinterProps) => {
 
     // GL related stuff
     const programRef = useRef<WebGLProgram | null>(null);
-    const vaoRef = useRef<WebGLVertexArrayObject | null>(null);
     const instanceBufferRef = useRef<WebGLBuffer | null>(null);
 
     useEffect(() => {
@@ -139,10 +146,6 @@ const Winter = ({ spawnRate }: WinterProps) => {
         const resLocation = gl.getUniformLocation(program, "canvasDimensions");
         gl.uniform2f(resLocation, canvas.width, canvas.height);
 
-        const vao = gl.createVertexArray();
-        gl.bindVertexArray(vao);
-        vaoRef.current = vao;
-
         // Create quad vertices
         const positions = new Float32Array([
             -0.5, -0.5,  0.0, 0.0,
@@ -156,35 +159,50 @@ const Winter = ({ spawnRate }: WinterProps) => {
             0, 2, 3,
         ]);
 
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        const vao = gl.createVertexArray();
+        gl.bindVertexArray(vao);
+        
+        const ibo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+        
+        const vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
-        const posLoc = gl.getAttribLocation(program, 'pos');
-        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 16, 0);
-        gl.enableVertexAttribArray(posLoc);
+        const vertexLoc = gl.getAttribLocation(program, 'pos');
+        gl.vertexAttribPointer(vertexLoc, 2, gl.FLOAT, false, 16, 0);
+        gl.enableVertexAttribArray(vertexLoc);
 
         const texCoordLoc = gl.getAttribLocation(program, 'texCoord');
         gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 16, 8);
         gl.enableVertexAttribArray(texCoordLoc);
 
-        const indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
         const instanceBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
         instanceBufferRef.current = instanceBuffer;
 
-        const positionLoc = gl.getAttribLocation(program, 'instancePosition');
-        gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 20, 0);
-        gl.vertexAttribDivisor(positionLoc, 1);
-        gl.enableVertexAttribArray(positionLoc);
+        // setup instancing data
+        const stride = 20;
+        const pposLoc = gl.getAttribLocation(program, 'ipos');
+        gl.vertexAttribPointer(pposLoc, 2, gl.FLOAT, false, stride, 0);
+        gl.vertexAttribDivisor(pposLoc, 1);
+        gl.enableVertexAttribArray(pposLoc);
 
-        const scaleLoc = gl.getAttribLocation(program, 'instanceScale');
-        gl.vertexAttribPointer(scaleLoc, 2, gl.FLOAT, false, 20, 12);
+        const rotLoc = gl.getAttribLocation(program, 'irotation');
+        gl.vertexAttribPointer(rotLoc, 1, gl.FLOAT, false, stride, 8);
+        gl.vertexAttribDivisor(rotLoc, 1);
+        gl.enableVertexAttribArray(rotLoc);
+
+        const scaleLoc = gl.getAttribLocation(program, 'iscale');
+        gl.vertexAttribPointer(scaleLoc, 1, gl.FLOAT, false, stride, 12);
         gl.vertexAttribDivisor(scaleLoc, 1);
         gl.enableVertexAttribArray(scaleLoc);
+
+        const opacityLoc = gl.getAttribLocation(program, 'iopacity');
+        gl.vertexAttribPointer(opacityLoc, 1, gl.FLOAT, false, stride, 16);
+        gl.vertexAttribDivisor(opacityLoc, 1);
+        gl.enableVertexAttribArray(opacityLoc);
 
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
