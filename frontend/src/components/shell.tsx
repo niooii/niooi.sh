@@ -24,7 +24,7 @@ const Shell = ({ currDir = "/", commands = [] }: ShellProps) => {
     const [history, setHistory] = useState<string[]>([]);
     const [showCursor, setShowCursor] = useState<boolean>(true);
     const inputRef = useRef<HTMLInputElement>(null);
-    const pathRef = useRef<string>(currDir);
+    const dirRef = useRef<string>(currDir);
     const promptRef = useRef<string>(`[${user}@${host} ${currDir}]$`);
 
     useEffect(() => {
