@@ -1,5 +1,6 @@
 "use client"
 
+import Shell from "@/components/shell";
 import Mandelbrot from "@/components/vfx/mandelbrot";
 import Winter from "@/components/vfx/winter";
 
@@ -8,7 +9,8 @@ export default function Home() {
     <div className="min-h-screen bg-black">
       <pre>
         wah wah wah
-        </pre>
+      </pre>
+      <Shell/>
       <Winter spawnRate={10}></Winter>
       <Mandelbrot width={1440} height={1440}></Mandelbrot>
       <h1>MOVE MOUSE</h1>
