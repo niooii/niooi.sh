@@ -59,7 +59,7 @@ void main() {
     // mandelbrot parameterized
     vec2 z = pixel;
     // to [-0.125, 0.125] -> ~[0.75, 0.9]
-    vec2 c = vec2(0.14, normMousePos.y / 8.0 + 0.70);
+    vec2 c = vec2(normMousePos.x / 8.0 + 0.14, normMousePos.y / 10.0 + 0.735);
     // exponent
     vec2 x = vec2(normMousePos.x / 4.0 + 1.7, 0.1);
 
