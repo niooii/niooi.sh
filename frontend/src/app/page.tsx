@@ -1,6 +1,6 @@
 "use client"
 
-import AnimationTest from "@/components/animation_test";
+import Mandelbrot from "@/components/vfx/mandelbrot";
 import Winter from "@/components/vfx/winter";
 
 export default function Home() {
@@ -10,6 +10,7 @@ export default function Home() {
         wah wah wah
         </pre>
       <Winter spawnRate={10}></Winter>
+      <Mandelbrot width={1440} height={1440}></Mandelbrot>
       <h1>MOVE MOUSE</h1>
       <h1 className="text-center text-7xl">HI CHAT</h1>
     </div>

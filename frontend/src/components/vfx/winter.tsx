@@ -1,5 +1,5 @@
 "use client"
-import React, { RefObject, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from "react";
 
 const vertSrc = `#version 300 es
 in vec4 pos;
@@ -114,8 +114,8 @@ const Winter = ({ spawnRate }: WinterProps) => {
             });
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
 
 
@@ -170,11 +170,11 @@ const Winter = ({ spawnRate }: WinterProps) => {
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
-        const vertexLoc = gl.getAttribLocation(program, 'pos');
+        const vertexLoc = gl.getAttribLocation(program, "pos");
         gl.vertexAttribPointer(vertexLoc, 2, gl.FLOAT, false, 16, 0);
         gl.enableVertexAttribArray(vertexLoc);
 
-        const texCoordLoc = gl.getAttribLocation(program, 'texCoord');
+        const texCoordLoc = gl.getAttribLocation(program, "texCoord");
         gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 16, 8);
         gl.enableVertexAttribArray(texCoordLoc);
 
@@ -184,22 +184,22 @@ const Winter = ({ spawnRate }: WinterProps) => {
 
         // setup instancing data
         const stride = 20;
-        const pposLoc = gl.getAttribLocation(program, 'ipos');
+        const pposLoc = gl.getAttribLocation(program, "ipos");
         gl.vertexAttribPointer(pposLoc, 2, gl.FLOAT, false, stride, 0);
         gl.vertexAttribDivisor(pposLoc, 1);
         gl.enableVertexAttribArray(pposLoc);
 
-        const rotLoc = gl.getAttribLocation(program, 'irotation');
+        const rotLoc = gl.getAttribLocation(program, "irotation");
         gl.vertexAttribPointer(rotLoc, 1, gl.FLOAT, false, stride, 8);
         gl.vertexAttribDivisor(rotLoc, 1);
         gl.enableVertexAttribArray(rotLoc);
 
-        const scaleLoc = gl.getAttribLocation(program, 'iscale');
+        const scaleLoc = gl.getAttribLocation(program, "iscale");
         gl.vertexAttribPointer(scaleLoc, 1, gl.FLOAT, false, stride, 12);
         gl.vertexAttribDivisor(scaleLoc, 1);
         gl.enableVertexAttribArray(scaleLoc);
 
-        const opacityLoc = gl.getAttribLocation(program, 'iopacity');
+        const opacityLoc = gl.getAttribLocation(program, "iopacity");
         gl.vertexAttribPointer(opacityLoc, 1, gl.FLOAT, false, stride, 16);
         gl.vertexAttribDivisor(opacityLoc, 1);
         gl.enableVertexAttribArray(opacityLoc);
@@ -214,14 +214,14 @@ const Winter = ({ spawnRate }: WinterProps) => {
 
         // load snowflake img
         const img = new Image();
-        img.src = "/snow.png";
+        img.src = "/sprites/snow.png";
         img.onerror = (e) => {
-            console.error('failed to load snowflake image:', e);
+            console.error("failed to load snowflake image:", e);
             imageRef.current = undefined;
         };
 
         img.onload = () => {
-            console.log('snowflake image loaded successfully');
+            console.log("snowflake image loaded successfully");
             imageRef.current = img;
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageRef.current!);
             gl.generateMipmap(gl.TEXTURE_2D);
@@ -307,11 +307,13 @@ const Winter = ({ spawnRate }: WinterProps) => {
     }, []);
 
     return (
+        <>
         <canvas
             ref={canvasRef}
             className="pointer-events-none fixed inset-0 z-50"
-            style={{ touchAction: 'none' }}
+            style={{ touchAction: "none" }}
         />
+        </>
     );
 };
 
