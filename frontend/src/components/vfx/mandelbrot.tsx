@@ -14,6 +14,7 @@ uniform vec2 canvasDimensions;
 uniform vec2 siteDimensions;
 uniform vec2 mousePos;
 uniform float time;
+uniform float zoom;
 
 vec4 map_to_color(float t) {
     float r = 9.0 * (1.0 - t) * t * t * t;
@@ -23,20 +24,19 @@ vec4 map_to_color(float t) {
     return col * 1.f;
 }
 
+// z = a + bi, w = c + di
 vec2 complexPow(vec2 z, vec2 w) {
-    // z = a + bi, w = c + di
-    float a = z.x;
-    float b = z.y;
-    float c = w.x;
-    float d = w.y;
+    float a2 = z.x * z.x;
+    float b2 = z.y * z.y;
+    float r = sqrt(a2 + b2) + 1e-9;
+    float theta = atan(z.y, z.x);
     
-    // small epsilon so atan isnt undefined
-    float r = sqrt(a * a + b * b) + 1e-9;
-    float theta = atan(b, a);
+    // Reduce expensive operations
+    float logr = log(r);
+    float modulus = exp(w.x * logr - w.y * theta);
+    float angle = w.y * logr + w.x * theta;
     
-    float modulus = pow(r, c) * exp(-d * theta);
-    float angle = d * log(r) + c * theta;
-    
+    // Use sincos if available in your GLSL version
     return modulus * vec2(cos(angle), sin(angle));
 }
 
@@ -45,31 +45,25 @@ vec2 f(vec2 z, vec2 c, vec2 x) {
 }
 
 void main() {
-    const float zoom = 1.5f;
-
     vec2 uv = gl_FragCoord.xy / canvasDimensions;
     vec2 pixel = (uv * 2.0 - 1.0) * zoom;
 
     // a vector from [-1, 1] for x and y
     vec2 normMousePos = vec2((mousePos.x / siteDimensions.x) * 2.0 - 1.0, (mousePos.y / siteDimensions.y) * 2.0 - 1.0);
    
-    const int maxIter = 500;
-    bool escaped = false;
-    
     // mandelbrot parameterized
     vec2 z = pixel;
     // to [-0.125, 0.125] -> ~[0.75, 0.9]
-    vec2 c = vec2(normMousePos.x / 8.0 + 0.14, normMousePos.y / 10.0 + 0.735);
+    vec2 c = vec2(normMousePos.x / 8.0 + 0.14, (-normMousePos.y / 10.0 + 0.725));
     // exponent
     vec2 x = vec2(normMousePos.x / 4.0 + 1.7, 0.1);
-
+    
+    const int maxIter = 800;
     int i = 0;
     for(; i < maxIter; i++) {
         z = f(z, c, x);
-        if (length(z) > 2.0) {
-            escaped = true;
+        if (dot(z, z) > float(maxIter) / 2.0)
             break;
-        }
     }
    
     vec4 color = map_to_color(float(i) / float(maxIter));
@@ -84,7 +78,7 @@ type MandelbrotProps = {
 const Mandelbrot = ({width, height}: MandelbrotProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const programRef = useRef<WebGLProgram | null>(null);
-    const zoomRef = useRef<number>(1.0);
+    const zoomRef = useRef<number>(1.5);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -114,6 +108,8 @@ const Mandelbrot = ({width, height}: MandelbrotProps) => {
         gl.uniform2f(canvasDimensionsLoc, canvas.width, canvas.height);
         const siteDimensionsLoc = gl.getUniformLocation(programRef.current!, "siteDimensions");
         gl.uniform2f(siteDimensionsLoc, window.innerWidth, window.innerHeight);
+        const zoomLoc = gl.getUniformLocation(programRef.current!, "zoom");
+        gl.uniform1f(zoomLoc, zoomRef.current);
 
         const positions = new Float32Array([
             -1, -1,
@@ -150,9 +146,11 @@ const Mandelbrot = ({width, height}: MandelbrotProps) => {
         render(0);
 
         const handleWheel = (e: WheelEvent) => {
-            // e.preventDefault();
-            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            e.preventDefault();
+            const zoomFactor = e.deltaY < 0 ? 0.9 : 1.1;
             zoomRef.current *= zoomFactor;
+            const zoomLoc = gl.getUniformLocation(programRef.current!, "zoom");
+            gl.uniform1f(zoomLoc, zoomRef.current);
         };
 
         canvas.addEventListener("wheel", handleWheel);

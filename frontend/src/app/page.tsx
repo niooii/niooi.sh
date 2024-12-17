@@ -12,7 +12,7 @@ export default function Home() {
       </pre>
       <Shell/>
       <Winter spawnRate={10}></Winter>
-      <Mandelbrot width={1440} height={1440}></Mandelbrot>
+      <Mandelbrot width={600} height={600}></Mandelbrot>
       <h1>MOVE MOUSE</h1>
       <h1 className="text-center text-7xl">HI CHAT</h1>
     </div>
