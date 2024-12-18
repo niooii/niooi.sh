@@ -7,6 +7,7 @@ export enum FileType {
 export class Path {
     private pathStr: string;
     
+    // Uses front slashes
     constructor(pathString: string) {
         if (pathString.length === 0)
             throw new Error("Path cannot be an empty string.");
@@ -15,14 +16,45 @@ export class Path {
         // atp we can assume no trailing slashes
     }
 
+    public toString(): string {
+        // force deep copy
+        return `${this.pathStr}`;
+    }
+
+    // Returns a new path object from the current one, not a ref.
+    public clone() {
+        return new Path(this.toString());
+    }
+
+    // Sets the current path to the one passed in
+    public set(to: Path) {
+        this.pathStr = to.toString();
+    }
+    
     // A path is considered absolute if it starts with the root: "/"
     public isAbsolute(): boolean {
         return this.pathStr.startsWith("/");
     }
 
+    public isRoot(): boolean {
+        return this.pathStr === "/";
+    }
+
     // A path is considered relative if it does not start with the root: "/"
     public isRelative(): boolean {
         return !this.isAbsolute();
+    }
+
+    // Includes the root path if applicable.
+    public getPathParts(): string[] {
+        if (this.isRoot())
+            return ["/"];
+
+        let parts = this.pathStr.split("/");
+        if (this.isAbsolute()) {
+            parts[0] = "/";
+        }
+        return parts;
     }
 
     private removeTrailingSlashes() {
@@ -97,26 +129,26 @@ export class Path {
     }
 }
 
-interface INode {
+export interface FileNode {
     path: Path;
     type: FileType;
     // only present for files
     content?: string;
     // only present for directories 
-    children?: Map<string, INode>;
-    parent?: INode;
+    children?: Map<string, FileNode>;
+    parent?: FileNode;
     createdAt: Date;
     modifiedAt: Date;
 }
 
 export class FileSystem {
-    private root: INode;
+    private root: FileNode;
     
     constructor() {
         this.root = this.createNode(new Path("/"), FileType.Directory);
     }
 
-    private createNode(path: Path, type: FileType, content?: string): INode {
+    private createNode(path: Path, type: FileType, content?: string): FileNode {
         const now = new Date();
         return {
             path,
@@ -126,5 +158,72 @@ export class FileSystem {
             createdAt: now,
             modifiedAt: now,
         };
+    }
+
+    // creates all intermediate directories if they dont exist, up until the current name of the path
+    // Returns the last created node (the parent of the target path) or the problematic node.
+    // yay head recursion
+    private createIntermediateDirectories(path: Path): [FileNode, boolean] {
+        if (path.isRelative())
+            throw new Error("To create intermediate direcotires, path cannot be relative.");
+
+        // will never be undefined from implementation details.
+        let subPath = path.parent()!;
+        if (subPath.isRoot()) {
+            // hit root directory
+            return [this.root, true];
+        } else {
+            const nodeAtSubPath = this.getNode(subPath);
+            if (nodeAtSubPath !== undefined) {
+                return [nodeAtSubPath, nodeAtSubPath.type !== FileType.File];
+            }
+            
+            let [node, status] = this.createIntermediateDirectories(subPath);
+            if (!status) {
+                return [node, status];
+            }
+            const name = subPath.name();
+            const newNode = this.createNode(subPath, FileType.Directory);
+            node.children!.set(name, newNode);
+            return [newNode, true];
+        }
+    }
+
+    public getNode(path: Path): FileNode | undefined {
+        if (path.isRelative())
+            throw new Error("Expected an absolute path when fetching node.");
+
+        let parts = path.getPathParts();
+        let node = this.root;
+        // skip first node (is root)
+        for (let i = 1; i < parts.length; i++) {
+            let part = parts[i];
+            console.log(part);
+            let child = node.children!.get(part);
+            // if child is a file and if it is not the last entry then return undefined
+            if (child === undefined || (child.type === FileType.File && i !== parts.length - 1)) {
+                return undefined;
+            }
+            node = child;
+        }
+        return node;
+    }
+
+    public makeDir(path: Path): FileNode | undefined {
+        let [parentNode, status] = this.createIntermediateDirectories(path);
+        if (!status)
+            return undefined;
+
+        parentNode.children!.set(path.name(), this.createNode(path, FileType.Directory));
+        return parentNode.children!.get(path.name())!;
+    }
+
+    public makeFile(path: Path, content?: string): FileNode | undefined  {
+        let [parentNode, status] = this.createIntermediateDirectories(path);
+        if (!status)
+            return undefined;
+
+        parentNode.children!.set(path.name(), this.createNode(path, FileType.File));
+        return parentNode.children!.get(path.name())!;
     }
 }

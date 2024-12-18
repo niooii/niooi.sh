@@ -1,4 +1,5 @@
 "use client"
+import { FileNode, FileSystem, FileType, Path } from "@/lib/filesystem";
 import React, { useEffect, useRef, useState } from "react";
 
 class Command {
@@ -42,7 +43,9 @@ const builtIns: Command[] = [
     new Command(
         "cd",
         (input, ctx) => {
-            ctx.printLn("...");
+            let result = ctx.cd(new Path(input));
+            if (result !== undefined)
+                ctx.printLn(result);
 
             return 0;
         }
@@ -50,21 +53,54 @@ const builtIns: Command[] = [
     new Command(
         "ls",
         (input, ctx) => {
-            ctx.printLn("...");
-
+            ctx.printLn("");
+            let cwd = ctx.getCwdNode();
+            cwd.children!.entries().forEach(([name, node]) => {
+                ctx.print(`${node.type === FileType.Directory ? "📁" : "🗎"}${name} `)
+            });
+            
             return 0;
         }
     ),
 ];
+
+
+const defaultFs = new FileSystem();
+const defaultCwd = new Path("/");
 
 class ShellContext {
     private history: string[];
     private inputHistory: string[];
     private historyIdx: number
     private cmds: Map<string, Command>;
+    private fs: FileSystem;
+    private cwd: Path;
+    private cwdNode: FileNode;
     private updateState: () => void;
 
-    constructor(commands: Command[], updateState: () => void) {
+    constructor(commands: Command[], fs: FileSystem, cwd: Path, updateState: () => void) {
+        this.fs = fs;
+        this.cwd = cwd;
+        let node = fs.getNode(this.cwd);
+        console.log("CONSTRUCTOR CALLED.");
+
+        const loadDefaultNode = () => {
+            this.cwd = defaultCwd;
+            let node = fs.getNode(this.cwd);
+            if (node === undefined || node.type !== FileType.Directory) {
+                throw new Error("Default path is bad, good luck buddy.");
+            }
+        }
+        if (node === undefined) {
+            console.warn(`The path '${this.cwd.toString()}' doesn't exist, resorting to default directory: '${defaultCwd.toString()}'`);
+            loadDefaultNode();
+        }
+        if (node!.type !== FileType.Directory) {
+            console.warn(`The path '${this.cwd.toString()}' isn't a directory, resorting to default directory: '${defaultCwd.toString()}'`);
+            loadDefaultNode();
+        }
+
+        this.cwdNode = node!;
         this.history = [];
         this.inputHistory = [];
         this.historyIdx = 0;
@@ -74,8 +110,44 @@ class ShellContext {
         this.updateState = updateState;
     }
 
+    public getFileSystem(): FileSystem {
+        return this.fs;
+    }
+
+    public getCwdNode(): Readonly<FileNode> {
+        return this.cwdNode;
+    }
+
+    public cd(path: Path): string | undefined {
+        let newPath: Path;
+
+        if (path.isAbsolute()) {
+            newPath = path.clone();
+        } else {
+            newPath = this.cwd.clone();
+            newPath.push(path);
+        }
+
+        const node = this.fs.getNode(newPath);
+        if (node === undefined) {
+            console.log(this.fs);
+            return `Could not find the path '${newPath.toString()}'`;
+        }
+        if (node.type !== FileType.Directory) {
+            return `'${newPath.toString()}' is not a directory`;
+        }
+
+        this.cwd.set(newPath);
+        this.cwdNode = node;
+        this.updateState();
+    }
+
     public printLn(s: string) {
         this.history.push(s);
+    }
+
+    public print(s: string) {
+        this.history[this.history.length - 1] = this.history[this.history.length - 1].concat(s);
     }
 
     public getHistory(): string[] {
@@ -125,42 +197,71 @@ class ShellContext {
         this.historyIdx = this.inputHistory.length;
         this.updateState();
     };
+
+    public getCwd(): Path {
+        return this.cwd;
+    }
 }
 
 type ShellProps = {
-    currDir?: string;
+    fs?: FileSystem;
+    cwd?: Path;
     commands?: Command[];
 };
+
+// millis
+const cursorBlinkSpeed = 530;
 
 // TODO! something...
 const user: string = "visitor";
 const host: string = "niooi.sh";
-const Shell = ({ currDir = "/", commands = [] }: ShellProps) => {
-    
+const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) => {
     const [input, setInput] = useState<string>("");
     const [cursorPosition, setCursorPosition] = useState<number>(0);
     const [showCursor, setShowCursor] = useState<boolean>(true);
+    const cursorIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const [_, setState] = useState<boolean>(true);
-    const ctxRef = useRef<ShellContext>(new ShellContext(commands, () => {setState(p => !p);}));
+    const ctxRef = useRef<ShellContext>(new ShellContext(
+        commands, 
+        fs,
+        cwd,
+        // dumb hack to update state eww
+        () => {setState(p => !p);})
+    );
     const inputRef = useRef<HTMLInputElement>(null);
-    const dirRef = useRef<string>(currDir);
-    const promptRef = useRef<string>(`[${user}@${host} ${currDir}]$`);
-
-    useEffect(() => {
-        const cursorInterval = setInterval(() => {
-            setShowCursor(prev => !prev);
-        }, 530);
-
-        return () => clearInterval(cursorInterval);
-    }, []);
+    const promptRef = useRef<string>(`[${user}@${host} ${cwd.toString()}]$`);
+    const updatePrompt = () => {
+        promptRef.current = `[${user}@${host} ${ctxRef.current.getCwd().toString()}]$`;
+    }
 
     const handleShellClick = () => {
         inputRef.current?.focus();
     };
 
+    useEffect(() => {
+        cursorIntervalRef.current = setInterval(() => {
+            setShowCursor(prev => !prev);
+        }, cursorBlinkSpeed);
+
+        return () => {
+            if (cursorIntervalRef.current) {
+                clearInterval(cursorIntervalRef.current);
+            }
+        };
+    });
+
+    const resetCursorBlinkState = () => {
+        setShowCursor(true);
+        clearInterval(cursorIntervalRef.current);
+        cursorIntervalRef.current = setInterval(() => {
+            setShowCursor(prev => !prev);
+        }, cursorBlinkSpeed);
+    }
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
         setCursorPosition(e.target.selectionStart || 0);
+        resetCursorBlinkState();
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -171,6 +272,7 @@ const Shell = ({ currDir = "/", commands = [] }: ShellProps) => {
                 ctx.interpret(input);
                 setInput("");
                 setCursorPosition(0);
+                updatePrompt();
                 break;
             }
             case "ArrowUp": {
@@ -190,6 +292,7 @@ const Shell = ({ currDir = "/", commands = [] }: ShellProps) => {
             case "ArrowLeft": 
             case "ArrowRight": {
                 setCursorPosition(inputRef.current!.selectionStart || 0);
+                resetCursorBlinkState();
                 break;
             }
         }
