@@ -21,3 +21,12 @@ let c = fs.getNode(new Path("/a/b/c/d"));
 console.log(c);
 let root = fs.getNode(new Path("/"));
 console.log(root);
+
+let p = new Path("/a/./././../b");
+console.log(p.toString());
+let p2 = new Path(".");
+console.log(p2.toString());
+let p3 = new Path("/a/b/../");
+console.log(p3.toString());
+let p4 = new Path("/home/niooi/../../../");
+console.log(p4.toString());

@@ -4,12 +4,14 @@ import React, { useEffect, useRef, useState } from "react";
 
 class Command {
     readonly name: string;
+    readonly autoComplete: ShellAutoCompleteType;
     // the input string will never contain the command name
     readonly commandHandler: (input: string, ctx: ShellContext) => number;
 
-    constructor(name: string, commandHandler: (input: string, ctx: ShellContext) => number) {
+    constructor(name: string, commandHandler: (input: string, ctx: ShellContext) => number, autoComplete: ShellAutoCompleteType = ShellAutoCompleteType.None) {
         this.name = name;
         this.commandHandler = commandHandler;
+        this.autoComplete = autoComplete;
     }
 }
 
@@ -56,7 +58,16 @@ const builtIns: Command[] = [
             ctx.printLn("");
             let cwd = ctx.getCwdNode();
             cwd.children!.entries().forEach(([name, node]) => {
-                ctx.print(`${node.type === FileType.Directory ? "📁" : "🗎"}${name} `)
+                let icon = "";
+                if (node.type === FileType.Directory) {
+                    icon = "📁";
+                } else {
+                    if (node.executable)
+                        icon = "*";
+                    else
+                        icon = "🗎";
+                }
+                ctx.print(`${icon}${name} `)
             });
             
             return 0;
@@ -67,6 +78,14 @@ const builtIns: Command[] = [
 
 const defaultFs = new FileSystem();
 const defaultCwd = new Path("/");
+
+export enum ShellAutoCompleteType {
+    Everything,
+    Files,
+    Directories,
+    ExecutablesOnly,
+    None
+}
 
 class ShellContext {
     private history: string[];
@@ -108,6 +127,10 @@ class ShellContext {
             builtIns.concat(commands).map((c) => [c.name, c])
         )
         this.updateState = updateState;
+    }
+
+    public getCommand(name: string): Readonly<Command> | undefined {
+        return this.cmds.get(name);
     }
 
     public getFileSystem(): FileSystem {
@@ -238,6 +261,14 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
         inputRef.current?.focus();
     };
 
+    const setInputText = (str: string) => {
+        inputRef.current!.value = str;
+        setInput(str);
+        setCursorPosition(str.length);
+        inputRef.current!.focus();
+        inputRef.current!.setSelectionRange(str.length, str.length);
+    }
+
     useEffect(() => {
         cursorIntervalRef.current = setInterval(() => {
             setShowCursor(prev => !prev);
@@ -275,23 +306,64 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
                 updatePrompt();
                 break;
             }
+            case "Tab": {
+                e.preventDefault();
+                // quick auto completion for cd and ls
+                if (input.length === 0)
+                    break;
+                
+                // special case for opening files
+                if (input.startsWith("./")) {
+                    
+                    break;
+                }
+
+                const cmdName = input.split(" ")[0];
+                const cmd = ctx.getCommand(cmdName);
+                if (cmd === undefined)
+                    break;
+
+                switch (cmd.autoComplete) {
+                    // TODO!
+                    case ShellAutoCompleteType.Files: {
+                        
+                        break;
+                    }
+                    case ShellAutoCompleteType.Directories: {
+                        
+                        break;
+                    }
+                    case ShellAutoCompleteType.ExecutablesOnly: {
+                        
+                        break;
+                    }
+                    case ShellAutoCompleteType.Everything: {
+                        
+                        break;
+                    }
+                }
+
+                break;
+            }
             case "ArrowUp": {
+                e.preventDefault();
                 let str = ctx.nextOlderInputHistory();
-                inputRef.current!.value = str;
-                setInput(str);
-                setCursorPosition(inputRef.current!.selectionStart || 0);
+                setInputText(str);
                 break;
             }
             case "ArrowDown": {
+                e.preventDefault();
                 let str = ctx.nextNewerInputHistory();
-                inputRef.current!.value = str;
-                setInput(str);
-                setCursorPosition(inputRef.current!.selectionStart || 0);
+                setInputText(str);
                 break;
             }
-            case "ArrowLeft": 
+            case "ArrowLeft": {
+                setCursorPosition(cursorPosition - 1 < 0 ? 0 : cursorPosition - 1);
+                resetCursorBlinkState();
+                break;
+            }
             case "ArrowRight": {
-                setCursorPosition(inputRef.current!.selectionStart || 0);
+                setCursorPosition(cursorPosition + 1 > inputRef.current!.value.length ? inputRef.current!.value.length : cursorPosition + 1);
                 resetCursorBlinkState();
                 break;
             }

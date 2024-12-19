@@ -1,4 +1,4 @@
-// PLEASE ADD SUM TYPES I BEG
+// PLEASE ADD (better) SUM TYPES I BEG
 export enum FileType {
     File,
     Directory
@@ -14,6 +14,7 @@ export class Path {
         this.pathStr = pathString;
         this.removeTrailingSlashes();
         // atp we can assume no trailing slashes
+        this.resolveRelativeParts();
     }
 
     public toString(): string {
@@ -55,6 +56,37 @@ export class Path {
             parts[0] = "/";
         }
         return parts;
+    }
+
+    // Processes all the '../' and './' parts of the path, or leaving them if they cannot be resolved.
+    private resolveRelativeParts() {
+        let parts = this.getPathParts();
+        const isAbsolute = this.isAbsolute();
+        if (isAbsolute) {
+            parts.splice(0, 1);
+        }
+
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            if (part === "." && i !== 0) {
+                parts.splice(i, 1);
+                i--;
+                continue;
+            }
+            if (part === "..") {
+                if (parts[i-1] === "..")
+                    continue;
+                if (i >= 1) {
+                    parts.splice(i - 1, 2);
+                    i -= 2;
+                } else if (isAbsolute) {
+                    parts.splice(i, 1);
+                    i--;
+                }
+                continue;
+            }
+        }
+        this.pathStr = `${isAbsolute ? "/" : ""}${parts.join("/")}`;
     }
 
     private removeTrailingSlashes() {
@@ -117,6 +149,8 @@ export class Path {
         }
 
         this.pathStr = `${basePath}/${other.pathStr}`;
+        this.resolveRelativeParts();
+        this.removeTrailingSlashes();
     }
 
     public pop() {
@@ -136,11 +170,14 @@ export interface FileNode {
     content?: string;
     // only present for directories 
     children?: Map<string, FileNode>;
+    executable: boolean,
+    executionCallback: ((args: string[]) => number) | undefined,
     parent?: FileNode;
     createdAt: Date;
     modifiedAt: Date;
 }
 
+// Fun little mock filesystem for the shell gimmick
 export class FileSystem {
     private root: FileNode;
     
@@ -155,6 +192,8 @@ export class FileSystem {
             type,
             content: type === FileType.File ? content || "" : undefined,
             children: type === FileType.Directory ? new Map() : undefined,
+            executable: false,
+            executionCallback: undefined,
             createdAt: now,
             modifiedAt: now,
         };
@@ -225,5 +264,10 @@ export class FileSystem {
 
         parentNode.children!.set(path.name(), this.createNode(path, FileType.File));
         return parentNode.children!.get(path.name())!;
+    }
+
+    public setExecutable(file: FileNode, executionCallback: (args: string[]) => number) {
+        file.executable = true;
+        file.executionCallback = executionCallback;
     }
 }
