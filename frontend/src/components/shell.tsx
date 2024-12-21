@@ -171,7 +171,9 @@ class ShellContext {
     // Resolves a path relative to the current working directory
     // Not guarenteed to exist in the filesystem.
     public resolveRelativePath(relPath: Path): Path {
-
+        const p = this.cwd.clone();
+        p.push(relPath);
+        return p;
     }
 
     public printLn(s: string) {
@@ -280,7 +282,6 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
         optionsArray: [],
         currDir: undefined,
     });
-    
 
     const handleShellClick = () => {
         inputRef.current?.focus();
@@ -321,7 +322,6 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
     };
 
     const getAutoCompletedString = () => {
-        console.log("GOT HERE...");
         const ctx: ShellContext = ctxRef.current;
         if (input.length === 0)
             return;
@@ -344,19 +344,23 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
             splitInput.pop();
         }
 
-        const referencedPath = ctx.getCwd().clone();
-        // TODO! fix parsing of paths like "/a/b/c/."
-        referencedPath.push(new Path(partialInput.length === 0 ? "./" : partialInput));
-        let currDir = referencedPath.parent();
+        let cdPath = ctx.resolveRelativePath(new Path(partialInput.length === 0 ? "./" : partialInput));
+        let currDir = cdPath.parent();
         currDir = currDir === undefined ? new Path("/") : currDir;
         console.log(`SEARCHING ${currDir}`);
         
         let acState = autoCompleteStateRef.current;
         // update if the command changed, if the search directory was never initialized
         // or if the search directory changed (i love explaining spaghetti code)
-        if (acState.currCmd !== cmd || acState.currDir === undefined || !currDir.equals(acState.currDir)) {
+        if (acState.currCmd !== cmd 
+            || acState.currDir === undefined 
+            || !currDir.equals(acState.currDir)
+        ) {
             acState.currCmd = cmd;
             acState.currDir = currDir;
+            // TODO! FIND A WAY TO update this only when the user changes the input via, yk input rn it updates all the time and it SUCKS
+            acState.prevPartialInput = partialInput;
+            console.log("PARTIAL INPUT: " + acState.prevPartialInput);
             const currNode = fs.getNode(currDir);
             if (currNode === undefined)
                 return;
@@ -365,19 +369,20 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
             switch (cmd.autoComplete) {
                 // TODO! filter by if the users partial input not just cycling every opt
                 case ShellAutoCompleteType.Files: {
-                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([_, node]) => node.type === FileType.File).map(([name, _]) => name));
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([name, node]) => node.type === FileType.File && name.startsWith(acState.prevPartialInput)).map(([name, _]) => name));
                     break;
                 }
                 case ShellAutoCompleteType.Directories: {
-                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([_, node]) => node.type === FileType.Directory).map(([name, _]) => name));
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([name, node]) => node.type === FileType.Directory && name.startsWith(acState.prevPartialInput)).map(([name, _]) => name));
                     break;
                 }
                 case ShellAutoCompleteType.ExecutablesOnly: {
-                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([_, node]) => node.executable).map(([name, _]) => name));
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([name, node]) => node.executable && name.startsWith(acState.prevPartialInput)).map(([name, _]) => name));
                     break;
                 }
                 case ShellAutoCompleteType.Everything: {
-                    acState.optionsArray = Array.from(currNode.children!.entries().map(([name, _]) => name));
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter
+                    (([name, _]) => name.startsWith(acState.prevPartialInput)).map(([name, _]) => name));
                     break;
                 }
             }
