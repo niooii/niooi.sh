@@ -7,12 +7,20 @@ class Command {
     readonly autoComplete: ShellAutoCompleteType;
     // the input string will never contain the command name
     readonly commandHandler: (input: string, ctx: ShellContext) => number;
-
-    constructor(name: string, commandHandler: (input: string, ctx: ShellContext) => number, autoComplete: ShellAutoCompleteType = ShellAutoCompleteType.None) {
+    
+    constructor(name: string, commandHandler: (input: string, ctx: ShellContext) => number, autoComplete: ShellAutoCompleteType = ShellAutoCompleteType.Nothing) {
         this.name = name;
         this.commandHandler = commandHandler;
         this.autoComplete = autoComplete;
     }
+}
+
+export enum ShellAutoCompleteType {
+    Everything,
+    Files,
+    Directories,
+    ExecutablesOnly,
+    Nothing
 }
 
 const builtIns: Command[] = [
@@ -32,7 +40,7 @@ const builtIns: Command[] = [
             ctx.clearHistory();
 
             return 0;
-        }
+        },
     ),
     new Command(
         "echo",
@@ -50,11 +58,13 @@ const builtIns: Command[] = [
                 ctx.printLn(result);
 
             return 0;
-        }
+        },
+        ShellAutoCompleteType.Directories
     ),
     new Command(
         "ls",
         (input, ctx) => {
+            // TODO! argument to list path of another dir
             ctx.printLn("");
             let cwd = ctx.getCwdNode();
             cwd.children!.entries().forEach(([name, node]) => {
@@ -71,21 +81,14 @@ const builtIns: Command[] = [
             });
             
             return 0;
-        }
+        },
+        ShellAutoCompleteType.Directories
     ),
 ];
 
 
 const defaultFs = new FileSystem();
 const defaultCwd = new Path("/");
-
-export enum ShellAutoCompleteType {
-    Everything,
-    Files,
-    Directories,
-    ExecutablesOnly,
-    None
-}
 
 class ShellContext {
     private history: string[];
@@ -165,6 +168,12 @@ class ShellContext {
         this.updateState();
     }
 
+    // Resolves a path relative to the current working directory
+    // Not guarenteed to exist in the filesystem.
+    public resolveRelativePath(relPath: Path): Path {
+
+    }
+
     public printLn(s: string) {
         this.history.push(s);
     }
@@ -232,6 +241,14 @@ type ShellProps = {
     commands?: Command[];
 };
 
+interface AutoCompleteState {
+    currCmd: Command | undefined;
+    currOptionIdx: number;
+    prevPartialInput: string;
+    optionsArray: string[];
+    currDir: Path | undefined;
+};
+
 // millis
 const cursorBlinkSpeed = 530;
 
@@ -256,6 +273,14 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
     const updatePrompt = () => {
         promptRef.current = `[${user}@${host} ${ctxRef.current.getCwd().toString()}]$`;
     }
+    const autoCompleteStateRef = useRef<AutoCompleteState>({
+        currCmd: undefined,
+        currOptionIdx: 0,
+        prevPartialInput: "",
+        optionsArray: [],
+        currDir: undefined,
+    });
+    
 
     const handleShellClick = () => {
         inputRef.current?.focus();
@@ -295,6 +320,84 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
         resetCursorBlinkState();
     };
 
+    const getAutoCompletedString = () => {
+        console.log("GOT HERE...");
+        const ctx: ShellContext = ctxRef.current;
+        if (input.length === 0)
+            return;
+
+        // special case for opening files
+        if (input.startsWith("./")) {
+            
+            return;
+        }
+
+        const splitInput = input.split(" ");
+        const cmdName = splitInput[0];
+        const cmd = ctx.getCommand(cmdName);
+        if (cmd === undefined || cmd.autoComplete === undefined || cmd.autoComplete === ShellAutoCompleteType.Nothing)
+            return;
+
+        let partialInput = "";
+        if (splitInput.length > 1) {
+            partialInput = splitInput[splitInput.length - 1];
+            splitInput.pop();
+        }
+
+        const referencedPath = ctx.getCwd().clone();
+        // TODO! fix parsing of paths like "/a/b/c/."
+        referencedPath.push(new Path(partialInput.length === 0 ? "./" : partialInput));
+        let currDir = referencedPath.parent();
+        currDir = currDir === undefined ? new Path("/") : currDir;
+        console.log(`SEARCHING ${currDir}`);
+        
+        let acState = autoCompleteStateRef.current;
+        // update if the command changed, if the search directory was never initialized
+        // or if the search directory changed (i love explaining spaghetti code)
+        if (acState.currCmd !== cmd || acState.currDir === undefined || !currDir.equals(acState.currDir)) {
+            acState.currCmd = cmd;
+            acState.currDir = currDir;
+            const currNode = fs.getNode(currDir);
+            if (currNode === undefined)
+                return;
+            // update the entries and reset the idx
+            acState.currOptionIdx = 0;
+            switch (cmd.autoComplete) {
+                // TODO! filter by if the users partial input not just cycling every opt
+                case ShellAutoCompleteType.Files: {
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([_, node]) => node.type === FileType.File).map(([name, _]) => name));
+                    break;
+                }
+                case ShellAutoCompleteType.Directories: {
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([_, node]) => node.type === FileType.Directory).map(([name, _]) => name));
+                    break;
+                }
+                case ShellAutoCompleteType.ExecutablesOnly: {
+                    acState.optionsArray = Array.from(currNode.children!.entries().filter(([_, node]) => node.executable).map(([name, _]) => name));
+                    break;
+                }
+                case ShellAutoCompleteType.Everything: {
+                    acState.optionsArray = Array.from(currNode.children!.entries().map(([name, _]) => name));
+                    break;
+                }
+            }
+        }
+        // now everythign should be up to date, return final string
+        const lastSlashIdx = partialInput.lastIndexOf("/");
+        const targetName = acState.optionsArray[acState.currOptionIdx];
+        if (acState.optionsArray.length === 0) 
+            return;
+            
+        console.log("OPTIONS: " + acState.optionsArray);
+        acState.currOptionIdx = (acState.currOptionIdx + 1) % acState.optionsArray.length;
+        if (lastSlashIdx !== -1) {
+            splitInput.push(partialInput.substring(0, lastSlashIdx).concat(`/${targetName}`));
+        } else {
+            splitInput.push(targetName);
+        }
+        return splitInput.join(" ");
+    }
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const ctx: ShellContext = ctxRef.current;
         switch (e.key) {
@@ -308,41 +411,11 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
             }
             case "Tab": {
                 e.preventDefault();
-                // quick auto completion for cd and ls
-                if (input.length === 0)
-                    break;
-                
-                // special case for opening files
-                if (input.startsWith("./")) {
-                    
-                    break;
+                const str = getAutoCompletedString();
+                console.log("GOT STR: " + str);
+                if (str !== undefined) {
+                    setInputText(str);
                 }
-
-                const cmdName = input.split(" ")[0];
-                const cmd = ctx.getCommand(cmdName);
-                if (cmd === undefined)
-                    break;
-
-                switch (cmd.autoComplete) {
-                    // TODO!
-                    case ShellAutoCompleteType.Files: {
-                        
-                        break;
-                    }
-                    case ShellAutoCompleteType.Directories: {
-                        
-                        break;
-                    }
-                    case ShellAutoCompleteType.ExecutablesOnly: {
-                        
-                        break;
-                    }
-                    case ShellAutoCompleteType.Everything: {
-                        
-                        break;
-                    }
-                }
-
                 break;
             }
             case "ArrowUp": {

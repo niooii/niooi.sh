@@ -30,3 +30,7 @@ let p3 = new Path("/a/b/../");
 console.log(p3.toString());
 let p4 = new Path("/home/niooi/../../../");
 console.log(p4.toString());
+let p5 = new Path("/");
+console.log(p5.toString());
+p5.push(new Path("./"));
+console.log(p5.toString());

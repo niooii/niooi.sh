@@ -68,7 +68,7 @@ export class Path {
 
         for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
-            if (part === "." && i !== 0) {
+            if (part === "." && (i !== 0 || isAbsolute)) {
                 parts.splice(i, 1);
                 i--;
                 continue;
@@ -91,9 +91,16 @@ export class Path {
 
     private removeTrailingSlashes() {
         if (this.pathStr.length > 1) {
+            const endsOnSlash = this.pathStr[this.pathStr.length-1] === "/";
             // Remove trailing slashes (regex magic)
             this.pathStr = this.pathStr.replace(/\/+$/, "");
+            if (endsOnSlash)
+                this.pathStr = this.pathStr.concat("/");
         }
+    }
+
+    public equals(other: Path): boolean {
+        return other.pathStr === this.pathStr;
     }
 
     // Returns undefined if the path is the root directory, or if the parent
@@ -144,11 +151,8 @@ export class Path {
 
         let basePath = this.pathStr;
         
-        if (basePath === "/") {
-            basePath = "";
-        }
-
-        this.pathStr = `${basePath}/${other.pathStr}`;
+        const endsOnSlash = this.pathStr[this.pathStr.length-1] === "/";
+        this.pathStr = `${basePath}${endsOnSlash ? "" : "/"}${other.pathStr}`;
         this.resolveRelativeParts();
         this.removeTrailingSlashes();
     }
