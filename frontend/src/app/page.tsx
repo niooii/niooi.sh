@@ -17,6 +17,7 @@ export default function Home() {
         let exec = fs.makeFile(new Path("/home/niooi/testexecutable"));
         exec!.executable = true;
         fs.makeDir(new Path("/notes"));
+        fs.makeDir(new Path("/nottes"));
 
         console.log(fs);
     })

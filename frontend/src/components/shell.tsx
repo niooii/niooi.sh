@@ -271,6 +271,7 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
         () => {setState(p => !p);})
     );
     const inputRef = useRef<HTMLInputElement>(null);
+    const isCurrentInputFromUser = useRef<boolean>(false);
     const promptRef = useRef<string>(`[${user}@${host} ${cwd.toString()}]$`);
     const updatePrompt = () => {
         promptRef.current = `[${user}@${host} ${ctxRef.current.getCwd().toString()}]$`;
@@ -316,8 +317,8 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInput(e.target.value);
-        setCursorPosition(e.target.selectionStart || 0);
+        setInputText(e.target.value);
+        isCurrentInputFromUser.current = true;
         resetCursorBlinkState();
     };
 
@@ -350,17 +351,21 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
         console.log(`SEARCHING ${currDir}`);
         
         let acState = autoCompleteStateRef.current;
+        let reload: boolean = false;
+        if (isCurrentInputFromUser.current) {
+            acState.prevPartialInput = partialInput;
+            reload = true;
+        }
         // update if the command changed, if the search directory was never initialized
         // or if the search directory changed (i love explaining spaghetti code)
-        if (acState.currCmd !== cmd 
+        if (reload
+            || acState.currCmd !== cmd 
             || acState.currDir === undefined 
             || !currDir.equals(acState.currDir)
         ) {
             acState.currCmd = cmd;
             acState.currDir = currDir;
             // TODO! FIND A WAY TO update this only when the user changes the input via, yk input rn it updates all the time and it SUCKS
-            acState.prevPartialInput = partialInput;
-            console.log("PARTIAL INPUT: " + acState.prevPartialInput);
             const currNode = fs.getNode(currDir);
             if (currNode === undefined)
                 return;
@@ -420,6 +425,7 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
                 console.log("GOT STR: " + str);
                 if (str !== undefined) {
                     setInputText(str);
+                    isCurrentInputFromUser.current = false;
                 }
                 break;
             }
@@ -427,12 +433,14 @@ const Shell = ({ fs = defaultFs, cwd = defaultCwd, commands = [] }: ShellProps) 
                 e.preventDefault();
                 let str = ctx.nextOlderInputHistory();
                 setInputText(str);
+                isCurrentInputFromUser.current = false;
                 break;
             }
             case "ArrowDown": {
                 e.preventDefault();
                 let str = ctx.nextNewerInputHistory();
                 setInputText(str);
+                isCurrentInputFromUser.current = false;
                 break;
             }
             case "ArrowLeft": {
