@@ -1,3 +1,5 @@
+import { ShellContext } from "./shell";
+
 // PLEASE ADD (better) SUM TYPES I BEG
 export enum FileType {
     File,
@@ -175,7 +177,7 @@ export interface FileNode {
     // only present for directories 
     children?: Map<string, FileNode>;
     executable: boolean,
-    executionCallback: ((args: string[]) => number) | undefined,
+    executionCallback: ((ctx: ShellContext, args: string[]) => number) | undefined,
     parent?: FileNode;
     createdAt: Date;
     modifiedAt: Date;
@@ -270,7 +272,7 @@ export class FileSystem {
         return parentNode.children!.get(path.name())!;
     }
 
-    public setExecutable(file: FileNode, executionCallback: (args: string[]) => number) {
+    public setExecutable(file: FileNode, executionCallback: (ctx: ShellContext, args: string[]) => number) {
         file.executable = true;
         file.executionCallback = executionCallback;
     }
