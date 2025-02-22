@@ -3,6 +3,7 @@
 import Shell from "@/components/shell";
 import Mandelbrot from "@/components/vfx/mandelbrot";
 import Winter from "@/components/vfx/winter";
+import { useSmoothMouse } from "@/hooks/smooth_mouse";
 import { FileSystem, Path } from "@/lib/filesystem";
 import { useEffect, useRef } from "react";
 
@@ -19,7 +20,7 @@ export default function Home() {
         fs.makeDir(new Path("/notes"));
         
         console.log(fs);
-    })
+    });
 
     return (
         <div className="min-h-screen bg-black">
