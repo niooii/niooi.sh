@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-spring/parallax": "^9.7.5",
     "battlezone-shapes": "^2.0.2",
     "next": "15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-parallax": "^3.5.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
