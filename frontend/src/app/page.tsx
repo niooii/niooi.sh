@@ -1,5 +1,6 @@
 "use client"
 
+import ProjectCard from "@/components/project_card";
 import Shell from "@/components/shell";
 import Mandelbrot from "@/components/vfx/mandelbrot";
 import Winter from "@/components/vfx/winter";
@@ -43,21 +44,23 @@ export default function Home() {
         // </div>
         <div style={{ width: '100%', height: '100%', background: '#253237' }}>
         <Parallax ref={parallax} pages={4}>
-            <ParallaxLayer offset={1} factor={3} speed={1} style={{ backgroundColor: '#805E73' }} />
+            <ParallaxLayer offset={1} factor={3} speed={1} style={{ backgroundColor: '#3b3b3b' }} />
+            <ParallaxLayer offset={2} speed={1} onClick={() => parallax.current.scrollTo(0)} />
             <ParallaxLayer offset={3} speed={1} style={{ backgroundColor: '#87BCDE' }} />
-
+           
             <ParallaxLayer
             offset={0}
             speed={0}
-            factor={3}
+            factor={3.25}
             style={{
-                backgroundImage: "stars.svg",
+                backgroundImage: "url(stars.svg)",
                 backgroundSize: 'cover',
             }}
-            />
-
+            / >
+            
+            {/* Github floating thingy */}
             <ParallaxLayer 
-                offset={1.3} 
+                offset={0.7} 
                 speed={-0.3} 
                 style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
                 >
@@ -102,18 +105,6 @@ export default function Home() {
             </ParallaxLayer>
 
             <ParallaxLayer
-                offset={3.3}
-                speed={-0.4}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pointerEvents: 'none',
-                }}>
-                <img src={"akaricough.png"} style={{ width: '30%' }} />
-            </ParallaxLayer>
-
-            <ParallaxLayer
                 offset={2}
                 speed={-0.3}
                 style={{
@@ -123,6 +114,7 @@ export default function Home() {
                 }}
             />
 
+            {/* Intro */}
             <ParallaxLayer
                 offset={0}
                 speed={0.1}
@@ -141,11 +133,21 @@ export default function Home() {
                     <img src={"vercel.svg"} style={{ width: '20%' }} />
                     <h1 
                         className="pt-8 text-center text-7xl font-semibold">
-                        YO dfdfdf asfasfsafsa
+                        Hey, it's nioon
                     </h1>
                 </div>
             </ParallaxLayer>
 
+            <ParallaxLayer
+                offset={0}
+                speed={0.9}
+                style={{
+                    pointerEvents: 'none',
+            }}>
+                <img src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} />
+            </ParallaxLayer>
+            
+            {/* Projects */}
             <ParallaxLayer
                 offset={1}
                 speed={0.1}
@@ -157,22 +159,47 @@ export default function Home() {
                 }}>
                 {/* <img src={"next.svg"} style={{ width: '40%' }} /> */}
                 <h1 
-                    className="text-center text-7xl font-semibold text-black">
-                    SOME STUFF IVE DONE..
+                    className="text-center text-7xl font-semibold">
+                    Some stuff I've done:
                 </h1>
             </ParallaxLayer>
 
+            <ParallaxLayer offset={1} speed={2}>
+            <ProjectCard
+                title="LaTeX (yea ok)"
+                imageUrl="demo.gif"
+                technologies={['nasm', 'cpp', 'Tailwind']}
+                projectLink="https://example.com/project"
+                githubLink="https://github.com/username/project"
+                maxWidth={400}
+            />
+            </ParallaxLayer>
+            
+            {/* Socials */}
             <ParallaxLayer
-                offset={2}
-                speed={-0}
+                offset={3}
+                speed={0.1}
+                onClick={() => parallax.current.scrollTo(2)}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                }}
-                onClick={() => parallax.current.scrollTo(0)}
+                }}>
+                <h1 
+                    className="text-center text-6xl font-semibold text-gray-700 underline">
+                    You can find me on
+                </h1>
+            </ParallaxLayer>
+
+            <ParallaxLayer 
+                offset={4} 
+                speed={-0.3} 
+                style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
                 >
-                {/* <img src={"file.svg"} style={{ width: '40%' }} /> */}
+            <img 
+                onClick={() => window.location.href = "https://discord.com/users/381851699763216386"} 
+                src={"icons/discord.svg"} 
+                />
             </ParallaxLayer>
         </Parallax>
     </div>
