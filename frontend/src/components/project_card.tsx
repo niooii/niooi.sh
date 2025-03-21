@@ -35,7 +35,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           {technologies.map((tech, index) => (
             <div 
               key={tech} 
-              className="rounded-full bg-white bg-opacity-90 shadow-md flex items-center justify-center border border-gray-300 transition-transform group-hover:scale-110 w-8 h-8 md:w-10 md:h-10"
+              className="rounded-full bg-white bg-opacity-90 shadow-md flex items-center justify-center border border-gray-300 transition-transform group-hover:scale-105 w-8 h-8 md:w-10 md:h-10"
               style={{ marginLeft: index === 0 ? 0 : '0.75rem' }}
             >
               <img 
@@ -50,8 +50,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       )}
       
       {/* image/gif */}
-      <div className="w-full overflow-hidden bg-gray-100">
+      <div className="w-full rounded-lg overflow-hidden bg-gray-100">
         <img 
+        
           src={imageUrl} 
           alt={title} 
           className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
@@ -60,7 +61,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       
       {/* Additional context on hover */}
       <div 
-        className={`absolute inset-0 bg-gradient-to-b from-black/70 to-black/50 text-white flex flex-col justify-center transition-opacity duration-300 overflow-auto p-3 md:p-6 ${
+        className={`absolute inset-0 rounded-lg bg-gradient-to-b from-black/70 to-black/50 text-white flex flex-col justify-center transition-opacity duration-300 overflow-auto p-3 md:p-6 ${
           isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
