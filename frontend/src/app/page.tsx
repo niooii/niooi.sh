@@ -25,6 +25,9 @@ export default function Home() {
     });
 
     const parallax = useRef<IParallax>(null!)
+    const starsFrontMoveSpeed = 0.5;
+    const starsBackMoveSpeed = 0.4;
+    const starsBackOpacity = 0.4;
 
     return (
         // <div className="min-h-screen bg-black">
@@ -44,23 +47,66 @@ export default function Home() {
         // </div>
         <div style={{ userSelect: 'none', width: '100%', height: '100%', background: '#253237' }}>
         <Parallax ref={parallax} pages={4}>
-        <ParallaxLayer
-            offset={1}
-            factor={3}
-            speed={1}
-            className="bg-gradient-to-b from-transparent via-neutral-800/100 to-neutral-800/100"
-        />
+            <ParallaxLayer
+                offset={1}
+                factor={3}
+                speed={1}
+                className="bg-gradient-to-b from-transparent via-neutral-800/100 to-neutral-800/100"
+                onClick={() => parallax.current.scrollTo(1)}
+            />
             <ParallaxLayer offset={2} speed={1} onClick={() => parallax.current.scrollTo(0)} />
             <ParallaxLayer offset={3} speed={1} className="bg-neutral-800" />
+            
+            {/* Star backgrounds */}
+            <ParallaxLayer
+                offset={0}
+                speed={starsFrontMoveSpeed}
+                factor={3}
+                style={{
+                    backgroundImage: "url(stars.svg)",
+                    backgroundRepeat: 'repeat-y',
+                    backgroundSize: 'cover',
+                }}
+            / >
            
             <ParallaxLayer
-            offset={0}
-            speed={0}
-            factor={3.25}
-            style={{
-                backgroundImage: "url(stars.svg)",
-                backgroundSize: 'cover',
-            }}
+                offset={0}
+                speed={starsBackMoveSpeed}
+                factor={3}
+                style={{
+                    backgroundImage: "url(stars.svg)",
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'repeat-y',
+                    marginTop: '-20%',
+                    marginLeft: '-3%',
+                    opacity: starsBackOpacity
+                }}
+            / >
+           
+            {/* repeat bc repeat-y doesnt work apparently */}
+            <ParallaxLayer
+                offset={2}
+                speed={starsFrontMoveSpeed}
+                factor={3}
+                style={{
+                    backgroundImage: "url(stars.svg)",
+                    backgroundRepeat: 'repeat-y',
+                    backgroundSize: 'cover',
+                }}
+            / >
+           
+            <ParallaxLayer
+                offset={2}
+                speed={starsBackMoveSpeed}
+                factor={3}
+                style={{
+                    backgroundImage: "url(stars.svg)",
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'repeat-y',
+                    marginTop: '-20%',
+                    marginLeft: '-3%',
+                    opacity: starsBackOpacity
+                }}
             / >
             
             {/* Github floating thingy */}
@@ -124,7 +170,6 @@ export default function Home() {
             <ParallaxLayer
                 offset={0}
                 speed={0.1}
-                onClick={() => parallax.current.scrollTo(1)}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -151,7 +196,7 @@ export default function Home() {
                 style={{
                     pointerEvents: 'none',
             }}>
-                <img className="rounded" src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} />
+                <img className="rounded-md" src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} />
             </ParallaxLayer>
             
             {/* Projects */}
