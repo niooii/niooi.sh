@@ -115,7 +115,6 @@ const Shell = ({fs, cwd, commands }: ShellProps) => {
         } else if (splitInput[0].length !== 0) {
             // probably exec a file
             autoCompleteType = ShellAutoCompleteType.ExecutablesAndDirectories;
-            console.log("b");
         }
 
         let cdPath = ctx.resolveRelativePath(new Path(partialInput.length === 0 ? "./" : partialInput));

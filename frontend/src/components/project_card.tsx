@@ -42,7 +42,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 src={`/icons/${tech.toLowerCase()}.svg`} 
                 alt={tech} 
                 title={tech}
-                className="w-5 h-5 md:w-6 md:h-6"
+                className="w-5 h-5 md:w-7 md:h-7"
               />
             </div>
           ))}
@@ -65,8 +65,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <p className="text-lg md:text-xl text-white font-semibold">{title}</p>
-        <div className="flex flex-wrap gap-2 mt-3 md:mt-4">
+        <div className="flex justify-center flex-wrap gap-2 mt-3 md:mt-4">
+        <p className="text-lg md:text-xl text-white font-semibold pb-5">{title}</p>
           {projectLink && (
             <a 
               href={projectLink} 

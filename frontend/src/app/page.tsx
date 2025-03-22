@@ -62,7 +62,8 @@ export default function Home() {
             <ParallaxLayer 
                 offset={0.7} 
                 speed={-0.3} 
-                style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
+                factor={0}
+                style={{ marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
                 >
             <img 
                 onClick={() => window.location.href = "https://github.com/niooii"} 
@@ -164,15 +165,38 @@ export default function Home() {
                 </h1>
             </ParallaxLayer>
 
-            <ParallaxLayer offset={1} speed={2}>
-            <ProjectCard
-                title="LaTeX (yea ok)"
-                imageUrl="demo.gif"
-                technologies={['nasm', 'cpp', 'Tailwind']}
-                projectLink="https://example.com/project"
-                githubLink="https://github.com/username/project"
-                maxWidth={400}
-            />
+            <ParallaxLayer 
+                offset={1.4} 
+                speed={1.2}
+                factor={0}
+                style={{
+                    marginLeft: '70%'
+                }}
+            >
+                <ProjectCard
+                    title="Procedural level generation"
+                    imageUrl="projects/procedural_gen.gif"
+                    technologies={['rust', 'csharp', 'unity']}
+                    githubLink="https://github.com/niooii/procedural-ikea-generation"
+                    maxWidth={400}
+                />
+            </ParallaxLayer>
+
+            <ParallaxLayer 
+                offset={2.0} 
+                speed={-0.3}
+                factor={0}
+                style={{
+                    marginLeft: '30%'
+                }}
+            >
+                <ProjectCard
+                    title="GDF (some voxel game)"
+                    imageUrl="projects/gdf.gif"
+                    technologies={['c', 'cpp', 'vulkan']}
+                    githubLink="https://github.com/niooii/gdf"
+                    maxWidth={400}
+                />
             </ParallaxLayer>
             
             {/* Socials */}
