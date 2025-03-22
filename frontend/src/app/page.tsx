@@ -42,11 +42,16 @@ export default function Home() {
 
         //     </Parallax>
         // </div>
-        <div style={{ width: '100%', height: '100%', background: '#253237' }}>
+        <div style={{ userSelect: 'none', width: '100%', height: '100%', background: '#253237' }}>
         <Parallax ref={parallax} pages={4}>
-            <ParallaxLayer offset={1} factor={3} speed={1} style={{ backgroundColor: '#3b3b3b' }} />
+        <ParallaxLayer
+            offset={1}
+            factor={3}
+            speed={1}
+            className="bg-gradient-to-b from-transparent via-neutral-800/100 to-neutral-800/100"
+        />
             <ParallaxLayer offset={2} speed={1} onClick={() => parallax.current.scrollTo(0)} />
-            <ParallaxLayer offset={3} speed={1} style={{ backgroundColor: '#87BCDE' }} />
+            <ParallaxLayer offset={3} speed={1} className="bg-neutral-800" />
            
             <ParallaxLayer
             offset={0}
@@ -133,9 +138,10 @@ export default function Home() {
                 }}>
                     <img src={"vercel.svg"} style={{ width: '20%' }} />
                     <h1 
-                        className="pt-8 text-center text-7xl font-semibold">
+                        className="pt-8 text-center text-viewport-10 font-semibold">
                         Hey, it's nioon
                     </h1>
+                    <p>Unironically addicted to making stuff</p>
                 </div>
             </ParallaxLayer>
 
@@ -145,7 +151,7 @@ export default function Home() {
                 style={{
                     pointerEvents: 'none',
             }}>
-                <img src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} />
+                <img className="rounded" src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} />
             </ParallaxLayer>
             
             {/* Projects */}
@@ -154,14 +160,16 @@ export default function Home() {
                 speed={0.1}
                 onClick={() => parallax.current.scrollTo(2)}
                 style={{
+                    zIndex: 2,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    pointerEvents: 'none'
                 }}>
                 {/* <img src={"next.svg"} style={{ width: '40%' }} /> */}
                 <h1 
-                    className="text-center text-7xl font-semibold">
-                    Some stuff I've worked on.
+                    className="text-center text-viewport-10 font-semibold">
+                    Some things I'm working on.
                 </h1>
             </ParallaxLayer>
 
@@ -170,7 +178,8 @@ export default function Home() {
                 speed={1.2}
                 factor={0}
                 style={{
-                    marginLeft: '70%'
+                    zIndex: 3,
+                    marginLeft: '20%'
                 }}
             >
                 <ProjectCard
@@ -178,7 +187,7 @@ export default function Home() {
                     imageUrl="projects/procedural_gen.gif"
                     technologies={['rust', 'csharp', 'unity']}
                     githubLink="https://github.com/niooii/procedural-ikea-generation"
-                    maxWidth={400}
+                    width={25}
                 />
             </ParallaxLayer>
 
@@ -187,15 +196,16 @@ export default function Home() {
                 speed={-0.3}
                 factor={0}
                 style={{
-                    marginLeft: '30%'
+                    marginLeft: '-20%',
+                    zIndex: 2
                 }}
             >
                 <ProjectCard
-                    title="GDF (some voxel game)"
+                    title="GDF"
                     imageUrl="projects/gdf.gif"
                     technologies={['c', 'cpp', 'vulkan']}
                     githubLink="https://github.com/niooii/gdf"
-                    maxWidth={400}
+                    width={30}
                 />
             </ParallaxLayer>
 
@@ -204,7 +214,8 @@ export default function Home() {
                 speed={1.5}
                 factor={0}
                 style={{
-                    marginLeft: '60%'
+                    marginLeft: '10%',
+                    opacity: '70%'
                 }}
             >
                 <ProjectCard
@@ -212,24 +223,24 @@ export default function Home() {
                     imageUrl="akari.png"
                     technologies={['rust', 'java', 'flutter']}
                     githubLink="https://github.com/niooii/jupitered-frontend"
-                    maxWidth={400}
+                    width={20}
                 />
             </ParallaxLayer>
 
             <ParallaxLayer 
                 offset={1.7} 
-                speed={1.3}
+                speed={0.5}
                 factor={0}
                 style={{
-                    marginLeft: '20%'
+                    marginLeft: '-30%',
+                    opacity: 0.8
                 }}
             >
                 <ProjectCard
                     title="Onion OS"
-                    imageUrl="akari.png"
+                    imageUrl="projects/onion-os-small.gif"
                     technologies={['C', 'rust']}
                     githubLink="https://github.com/niooii/onion-os"
-                    maxWidth={400}
                 />
             </ParallaxLayer>
             
@@ -244,7 +255,7 @@ export default function Home() {
                     justifyContent: 'center',
                 }}>
                 <h1 
-                    className="text-center text-6xl font-semibold text-gray-700 underline">
+                    className="text-center text-6xl font-semibold underline">
                     You can find me on
                 </h1>
             </ParallaxLayer>

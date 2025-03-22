@@ -20,11 +20,17 @@ uniform float zoom;
 
 vec4 map_to_color(float t) {
     vec3 color = vec3(
-        9.0 * (1.0 - t) * t * t * t,
-        15.0 * (1.0 - t) * (1.0 - t) * t * t,
-        8.5 * (1.0 - t) * (1.0 - t) * (1.0 - t) * t
+        3.0 * (1.0 - t) * t * t * t,                    // Very minimal red component
+        5.0 * (1.0 - t) * (1.0 - t) * t * t,            // Reduced green for some cyan tints
+        15.0 * (1.0 - t) * (1.0 - t) * (1.0 - t) * t    // Enhanced blue component
     );
- return vec4(color, 1.0);
+    
+    color.b = pow(color.b, 0.7);
+    
+    float intensity = smoothstep(0.0, 0.3, t) * smoothstep(1.0, 0.7, t);
+    color *= intensity * 1.5; 
+    
+    return vec4(color, 1.0);
 }
 
 vec2 complexPow(vec2 z, vec2 w) {
@@ -80,7 +86,7 @@ void main() {
     const float bailoutSquared = float(400 * 400);
  
     int i = 0;
-    const int maxIter = 400;
+    const int maxIter = 350;
     
     // in case early escapes
     for(int n = 0; n < 16; n++) {
@@ -107,7 +113,7 @@ void main() {
     }
     
     float t = float(i) / float(maxIter);
-    
+
     outColor = map_to_color(t);
 }`;
 
