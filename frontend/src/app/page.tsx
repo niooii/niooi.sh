@@ -161,7 +161,7 @@ export default function Home() {
                 {/* <img src={"next.svg"} style={{ width: '40%' }} /> */}
                 <h1 
                     className="text-center text-7xl font-semibold">
-                    Some stuff I've done:
+                    Some stuff I've worked on.
                 </h1>
             </ParallaxLayer>
 
