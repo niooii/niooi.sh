@@ -198,6 +198,40 @@ export default function Home() {
                     maxWidth={400}
                 />
             </ParallaxLayer>
+
+            <ParallaxLayer 
+                offset={2.0} 
+                speed={1.5}
+                factor={0}
+                style={{
+                    marginLeft: '60%'
+                }}
+            >
+                <ProjectCard
+                    title="Jupiter Ed App"
+                    imageUrl="akari.png"
+                    technologies={['rust', 'java', 'flutter']}
+                    githubLink="https://github.com/niooii/jupitered-frontend"
+                    maxWidth={400}
+                />
+            </ParallaxLayer>
+
+            <ParallaxLayer 
+                offset={1.7} 
+                speed={1.3}
+                factor={0}
+                style={{
+                    marginLeft: '20%'
+                }}
+            >
+                <ProjectCard
+                    title="Onion OS"
+                    imageUrl="akari.png"
+                    technologies={['C', 'rust']}
+                    githubLink="https://github.com/niooii/onion-os"
+                    maxWidth={400}
+                />
+            </ParallaxLayer>
             
             {/* Socials */}
             <ParallaxLayer

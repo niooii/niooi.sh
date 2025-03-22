@@ -59,27 +59,29 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         />
       </div>
       
-      {/* Additional context on hover */}
-      <div 
-        className={`absolute inset-0 rounded-lg bg-gradient-to-b from-black/70 to-black/50 text-white flex flex-col justify-center transition-opacity duration-300 overflow-auto p-3 md:p-6 ${
+      <div
+        className={`absolute inset-0 rounded-lg bg-gradient-to-b from-black/70 to-black/50 text-white flex flex-col justify-center items-center transition-opacity duration-300 overflow-auto p-3 md:p-6 ${
           isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className="flex justify-center flex-wrap gap-2 mt-3 md:mt-4">
-        <p className="text-lg md:text-xl text-white font-semibold pb-5">{title}</p>
+      <div className="text-center mb-4">
+        <p className="text-lg md:text-xl text-white font-semibold">{title}</p>
+      </div>
+      
+        <div className="flex justify-center gap-2">
           {projectLink && (
-            <a 
-              href={projectLink} 
-              target="_blank" 
+            <a
+              href={projectLink}
+              target="_blank"
               rel="noopener noreferrer"
               className="bg-white text-black rounded-md font-medium hover:bg-gray-200 transition-colors duration-300 flex items-center text-sm md:text-base px-2 py-1 md:px-4 md:py-2"
             >
               <span>Check it out!</span>
-              <svg 
-                className="ml-1 w-4 h-4" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24" 
+              <svg
+                className="ml-1 w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -88,9 +90,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           )}
           
           {githubLink && (
-            <a 
-              href={githubLink} 
-              target="_blank" 
+            <a
+              href={githubLink}
+              target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-800 text-white rounded-md font-medium hover:bg-gray-700 transition-colors duration-300 flex items-center text-sm md:text-base px-2 py-1 md:px-4 md:py-2"
             >
