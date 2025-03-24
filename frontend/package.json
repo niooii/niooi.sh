@@ -11,7 +11,7 @@
   "dependencies": {
     "@react-spring/parallax": "^9.7.5",
     "battlezone-shapes": "^2.0.2",
-    "next": "15.1.0",
+    "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-parallax": "^3.5.1"
