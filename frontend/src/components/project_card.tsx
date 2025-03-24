@@ -15,7 +15,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   technologies = [],
   projectLink,
   githubLink,
-  width = 20,
+  width = 15,
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   

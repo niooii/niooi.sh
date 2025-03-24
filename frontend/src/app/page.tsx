@@ -7,11 +7,14 @@ import Winter from "@/components/vfx/winter";
 import { useSmoothMouse } from "@/hooks/smooth_mouse";
 import { FileSystem, Path } from "@/lib/filesystem";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
-
+    const [screenWidthDiff, setScreenWidthDiff] = useState(
+        window.innerWidth - window.screen.availWidth
+    );
+    
     useEffect(() => {
         const fs = fsRef.current;
 
@@ -20,31 +23,25 @@ export default function Home() {
         let exec = fs.makeFile(new Path("/home/niooi/testexecutable"));
         fs.setExecutable(exec!, (ctx, args) => { ctx.printLn("HELLO WORLD CHAT"); return 0;});
         fs.makeDir(new Path("/notes"));
-        
-        console.log(fs);
-    });
+    }, []);
 
     const parallax = useRef<IParallax>(null!)
     const starsFrontMoveSpeed = 0.5;
     const starsBackMoveSpeed = 0.4;
     const starsBackOpacity = 0.4;
+    const mandelbrotWidth = Math.max(window.screen.availWidth, window.screen.height);
+    const mandelbrotHeight = mandelbrotWidth;
+
+    useEffect(() => {
+        const onresize = () => {
+            setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
+        };
+
+        addEventListener("resize", onresize);
+        return () => window.removeEventListener("resize", onresize);
+    }, [])
 
     return (
-        // <div className="min-h-screen bg-black">
-        //     {/* <Shell fs={fsRef.current} /> */}
-        //     {/* <Winter spawnRate={10}></Winter> */}
-            
-        //     <Parallax ref={parallax} pages={3}>
-        //         <ParallaxLayer offset={0} speed={1} style={{ backgroundColor: '#805E73' }} />
-        //         <ParallaxLayer offset={2} speed={1} style={{ backgroundColor: '#87BCDE' }} />
-
-        //         <ParallaxLayer offset={1} speed={2}> 
-        //             <h1 className="text-center text-7xl font-semibold">HI CHAT</h1>
-        //             <Mandelbrot width={600} height={600}></Mandelbrot>
-        //         </ParallaxLayer>
-
-        //     </Parallax>
-        // </div>
         <div style={{ userSelect: 'none', width: '100%', height: '100%', background: '#253237' }}>
         <Parallax ref={parallax} pages={4}>
             <ParallaxLayer
@@ -52,7 +49,6 @@ export default function Home() {
                 factor={3}
                 speed={1}
                 className="bg-gradient-to-b from-transparent via-neutral-800/100 to-neutral-800/100"
-                onClick={() => parallax.current.scrollTo(1)}
             />
             <ParallaxLayer offset={2} speed={1} onClick={() => parallax.current.scrollTo(0)} />
             <ParallaxLayer offset={3} speed={1} className="bg-neutral-800" />
@@ -131,8 +127,13 @@ export default function Home() {
                 <p className="text-xl italic font-medium">The julia set parameterized in 6d. Move your mouse!</p>
             </ParallaxLayer>
 
-            <ParallaxLayer offset={2.35} speed={0.6} style={{ pointerEvents: "none", zIndex: -1, opacity: 1 }}>
-                <Mandelbrot width={2000} height={2000}></Mandelbrot>
+            <ParallaxLayer offset={2.35} speed={0.6} style={{ 
+                pointerEvents: "none", 
+                zIndex: -1, 
+                opacity: 1,
+                marginLeft: screenWidthDiff / 2
+            }}>
+                <Mandelbrot width={mandelbrotWidth} height={mandelbrotHeight}></Mandelbrot>
             </ParallaxLayer>
 
             <ParallaxLayer offset={1} speed={0.5} style={{ opacity: 0.1 }}>
@@ -172,6 +173,26 @@ export default function Home() {
                 speed={0.1}
                 style={{
                     display: 'flex',
+                    justifyContent: 'center',
+                }}>
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    alignItems: 'center', 
+                }}>
+                    <h1 
+                        className="pt-8 text-center text-viewport-6 font-semibold">
+                        [🚧 website still under construction! 🚧]
+                    </h1>
+                </div>
+            </ParallaxLayer>
+            <ParallaxLayer
+                offset={0}
+                speed={0.1}
+                onClick={() => parallax.current.scrollTo(1)}
+                style={{
+                    display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
@@ -186,7 +207,8 @@ export default function Home() {
                         className="pt-8 text-center text-viewport-10 font-semibold">
                         Hey, it's nioon
                     </h1>
-                    <p>Unironically addicted to making stuff</p>
+                    <p className="text-viewport-3">I'm a CS + math major, and I'm addicted to making stuff</p>
+                    <p className="text-viewport-2 text-gray-300">[click me! or don't, you can just scroll]</p>
                 </div>
             </ParallaxLayer>
 
@@ -196,7 +218,7 @@ export default function Home() {
                 style={{
                     pointerEvents: 'none',
             }}>
-                <img className="rounded-md" src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} />
+                {/* <img className="rounded-md" src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} /> */}
             </ParallaxLayer>
             
             {/* Projects */}
@@ -205,22 +227,21 @@ export default function Home() {
                 speed={0.1}
                 onClick={() => parallax.current.scrollTo(2)}
                 style={{
-                    zIndex: 2,
+                    zIndex: 0,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    pointerEvents: 'none'
                 }}>
                 {/* <img src={"next.svg"} style={{ width: '40%' }} /> */}
                 <h1 
                     className="text-center text-viewport-10 font-semibold">
-                    Some things I'm working on.
+                    Some things I've worked on.
                 </h1>
             </ParallaxLayer>
 
             <ParallaxLayer 
-                offset={1.4} 
-                speed={1.2}
+                offset={1.34} 
+                speed={0.8}
                 factor={0}
                 style={{
                     zIndex: 3,
@@ -232,7 +253,7 @@ export default function Home() {
                     imageUrl="projects/procedural_gen.gif"
                     technologies={['rust', 'csharp', 'unity']}
                     githubLink="https://github.com/niooii/procedural-ikea-generation"
-                    width={25}
+                    width={20}
                 />
             </ParallaxLayer>
 
@@ -250,13 +271,13 @@ export default function Home() {
                     imageUrl="projects/gdf.gif"
                     technologies={['c', 'cpp', 'vulkan']}
                     githubLink="https://github.com/niooii/gdf"
-                    width={30}
+                    width={25}
                 />
             </ParallaxLayer>
 
             <ParallaxLayer 
-                offset={2.0} 
-                speed={1.5}
+                offset={1.7} 
+                speed={1.2}
                 factor={0}
                 style={{
                     marginLeft: '10%',
@@ -265,15 +286,15 @@ export default function Home() {
             >
                 <ProjectCard
                     title="Jupiter Ed App"
-                    imageUrl="akari.png"
+                    imageUrl="projects/jupiter.gif"
                     technologies={['rust', 'java', 'flutter']}
                     githubLink="https://github.com/niooii/jupitered-frontend"
-                    width={20}
+                    width={15}
                 />
             </ParallaxLayer>
 
             <ParallaxLayer 
-                offset={1.7} 
+                offset={1.3} 
                 speed={0.5}
                 factor={0}
                 style={{
@@ -292,7 +313,7 @@ export default function Home() {
             {/* Socials */}
             <ParallaxLayer
                 offset={3}
-                speed={0.1}
+                speed={1}
                 onClick={() => parallax.current.scrollTo(2)}
                 style={{
                     display: 'flex',
@@ -300,19 +321,32 @@ export default function Home() {
                     justifyContent: 'center',
                 }}>
                 <h1 
-                    className="text-center text-6xl font-semibold underline">
-                    You can find me on
+                    className="text-center text-6xl font-semibold">
+                    Like what you see?
                 </h1>
             </ParallaxLayer>
 
             <ParallaxLayer 
-                offset={4} 
-                speed={-0.3} 
+                offset={3.7} 
+                factor={0}
+                speed={2} 
                 style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
                 >
             <img 
                 onClick={() => window.location.href = "https://discord.com/users/381851699763216386"} 
                 src={"icons/discord.svg"} 
+                />
+            </ParallaxLayer>
+
+            <ParallaxLayer 
+                offset={3.3} 
+                factor={0}
+                speed={2.4} 
+                style={{ width: '10%', height: '5%', marginLeft: '20%', cursor: "pointer", zIndex: 99 }}  
+                >
+            <img 
+                onClick={() => window.location.href = "https://discord.com/users/381851699763216386"} 
+                src={"icons/google-gmail.svg"} 
                 />
             </ParallaxLayer>
         </Parallax>
