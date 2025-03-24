@@ -11,6 +11,9 @@ import { useEffect, useRef, useState } from "react";
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
     const [screenWidthDiff, setScreenWidthDiff] = useState(0);
+    const [isClientReady, setIsClientReady] = useState(false);
+    const [mandelbrotWidth, setMandelbrotWidth] = useState(0);
+    const [mandelbrotHeight, setMandelbrotHeight] = useState(0);
     
     useEffect(() => {
         const fs = fsRef.current;
@@ -26,14 +29,16 @@ export default function Home() {
     const starsFrontMoveSpeed = 0.5;
     const starsBackMoveSpeed = 0.4;
     const starsBackOpacity = 0.4;
-    var mandelbrotWidth = 0;
-    var mandelbrotHeight = mandelbrotWidth;
 
     useEffect(() => {
-        mandelbrotWidth = Math.max(window.screen.availWidth, window.screen.height);
-        mandelbrotHeight = mandelbrotWidth;
+        const width = Math.max(window.screen.availWidth, window.screen.height);
+        
+        setMandelbrotWidth(width);
+        setMandelbrotHeight(width);
 
         setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
+
+        setIsClientReady(true);
 
         const onresize = () => {
             setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
@@ -134,7 +139,12 @@ export default function Home() {
                 opacity: 1,
                 marginLeft: screenWidthDiff / 2
             }}>
-                <Mandelbrot width={mandelbrotWidth} height={mandelbrotHeight}></Mandelbrot>
+                {isClientReady && (
+                    <Mandelbrot 
+                        width={mandelbrotWidth} 
+                        height={mandelbrotHeight} 
+                    />
+                )}
             </ParallaxLayer>
 
             <ParallaxLayer offset={1} speed={0.5} style={{ opacity: 0.1 }}>

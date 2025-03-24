@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ProjectCardProps {
   title: string;
@@ -18,15 +18,39 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   width = 15,
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isPortrait, setIsPortrait] = useState<boolean>(false);
   
-  // Calculate font size and padding based on width prop
+  useEffect(() => {
+    if (!cardRef.current) return;
+    
+    const checkOrientation = () => {
+      const card = cardRef.current;
+      if (card) {
+        const { clientWidth, clientHeight } = card;
+        setIsPortrait(clientWidth < clientHeight);
+      }
+    };
+    
+    checkOrientation();
+    
+    const resizeObserver = new ResizeObserver(checkOrientation);
+    if (cardRef.current) {
+      resizeObserver.observe(cardRef.current);
+    }
+    
+    return () => {
+      if (cardRef.current) {
+        resizeObserver.unobserve(cardRef.current);
+      }
+    };
+  }, []);
+  
   const getTitleFontSize = () => {
-    // More conservative scaling for smaller cards
     return width < 15 ? '0.85rem' : `clamp(1rem, ${width / 25}rem, 1.75rem)`;
   };
   
   const getButtonStyles = () => {
-    // For small cards, make buttons much smaller
     if (width < 15) {
       return {
         padding: '0.25rem 0.5rem',
@@ -38,7 +62,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       };
     }
     
-    // For larger cards, maintain original proportional scaling
     const paddingY = `${Math.min(0.6, Math.max(0.3, width / 60))}rem`;
     const paddingX = `${Math.min(1, Math.max(0.5, width / 30))}rem`;
     const fontSize = `${Math.min(1.1, Math.max(0.75, width / 30))}rem`;
@@ -51,6 +74,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   
   return (
     <div
+      ref={cardRef}
       className="relative rounded-lg border-2 border-gray-300 transition-all duration-300 hover:shadow-xl bg-gray-800 group mx-auto"
       style={{
         width: `${width}vw`,
@@ -60,13 +84,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     >
       {/* Technology icons */}
       {technologies.length > 0 && (
-        <div className="absolute left-3 flex z-20" style={{ top: 0, transform: 'translateY(-50%)' }}>
+        <div 
+          className={`absolute z-20 flex ${isPortrait ? 'flex-col' : ''}`}
+          style={{ 
+            left: isPortrait ? '-1rem' : '0.75rem',
+            top: isPortrait ? '0.5rem' : '0',
+            transform: isPortrait ? 'none' : 'translateY(-50%)'
+          }}
+        >
           {technologies.map((tech, index) => (
             <div
               key={tech}
               className="rounded-full bg-white bg-opacity-90 shadow-md flex items-center justify-center border border-gray-300 transition-transform group-hover:scale-105"
               style={{ 
-                marginLeft: index === 0 ? 0 : '0.75rem',
+                marginLeft: isPortrait ? 0 : index === 0 ? 0 : '0.75rem',
+                marginTop: isPortrait ? (index === 0 ? 0 : '0.5rem') : 0,
                 width: `2.2rem`,
                 height: `2.3rem`,
               }}
@@ -100,7 +132,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         }`}
         style={{
           padding: width < 15 ? '0.5rem' : `${Math.max(0.75, width / 25)}rem`,
-          overflow: 'hidden' // Remove auto overflow to prevent scrollbars
+          overflow: 'hidden' 
         }}
       >
         <div className="text-center mb-4">
