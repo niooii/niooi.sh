@@ -32,7 +32,7 @@ export default function Home() {
 
     useEffect(() => {
         const width = Math.max(window.screen.availWidth, window.screen.height);
-        
+
         setMandelbrotWidth(width);
         setMandelbrotHeight(width);
 
@@ -139,12 +139,10 @@ export default function Home() {
                 opacity: 1,
                 marginLeft: screenWidthDiff / 2
             }}>
-                {isClientReady && (
-                    <Mandelbrot 
-                        width={mandelbrotWidth} 
-                        height={mandelbrotHeight} 
-                    />
-                )}
+                <Mandelbrot 
+                    width={mandelbrotWidth} 
+                    height={mandelbrotHeight} 
+                />
             </ParallaxLayer>
 
             <ParallaxLayer offset={1} speed={0.5} style={{ opacity: 0.1 }}>
@@ -357,7 +355,7 @@ export default function Home() {
             speed={2.4}
             style={{ width: '10%', height: '5%', marginLeft: '20%', cursor: "pointer", zIndex: 99 }}
             >
-                <Link href="https://discord.com/users/381851699763216386" target="_blank" rel="noopener noreferrer">
+                <Link href="mailto:onioniwonpounoin@gmail.com" target="_blank" rel="noopener noreferrer">
                     <img
                     src={"icons/google-gmail.svg"}
                     alt="Gmail Contact"

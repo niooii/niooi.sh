@@ -6,11 +6,11 @@ import { useRef, useEffect } from "react";
 const vertexShader = `#version 300 es
 in vec2 pos;
 void main() {
-  gl_Position = vec4(pos, 0.0, 1.0);
+    gl_Position = vec4(pos, 0.0, 1.0);
 }`;
 
 const fragmentShader = `#version 300 es
-precision mediump float; // Lower precision for better performance
+precision mediump float; 
 
 out vec4 outColor;
 
@@ -23,7 +23,7 @@ uniform float zoom;
 vec4 map_to_color(float t) {
     vec3 color = vec3(
         3.0 * (1.0 - t) * t * t * t, 
-        5.0 * (1.0 - t) * (1.0 - t) * t * t, /
+        5.0 * (1.0 - t) * (1.0 - t) * t * t, 
         15.0 * (1.0 - t) * (1.0 - t) * (1.0 - t) * t 
     );
     color.b = pow(color.b, 0.7);
@@ -37,10 +37,9 @@ vec2 complexPow(vec2 z, vec2 w) {
     
     if (lenSquared < 1e-10) return vec2(0.0);
     
-    // optimize for integer powerse
+    // optimize for integer powers
     if (abs(w.y) < 1e-6) {
         if (abs(w.x - 2.0) < 1e-6) {
-            // z² - very common case, direct formula is much faster
             return vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y);
         }
         else if (abs(w.x - 3.0) < 1e-6) {
@@ -62,7 +61,7 @@ vec2 complexPow(vec2 z, vec2 w) {
     return modulus * vec2(cos(angle), sin(angle));
 }
 
-// Complex function we"re iterating
+// complex function we're iterating
 vec2 f(vec2 z, vec2 c, vec2 x) {
   return complexPow(z, x) + c;
 }
