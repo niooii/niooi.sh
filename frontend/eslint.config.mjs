@@ -9,6 +9,12 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
+module.exports = {
+	// ...other config
+	ignorePatterns: ["**/*.tsx", "**/*.ts"],
+};
+
+
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];

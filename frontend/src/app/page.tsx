@@ -1,19 +1,16 @@
 "use client"
 
 import ProjectCard from "@/components/project_card";
-import Shell from "@/components/shell";
 import Mandelbrot from "@/components/vfx/mandelbrot";
-import Winter from "@/components/vfx/winter";
 import { useSmoothMouse } from "@/hooks/smooth_mouse";
 import { FileSystem, Path } from "@/lib/filesystem";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
-    const [screenWidthDiff, setScreenWidthDiff] = useState(
-        window.innerWidth - window.screen.availWidth
-    );
+    const [screenWidthDiff, setScreenWidthDiff] = useState(0);
     
     useEffect(() => {
         const fs = fsRef.current;
@@ -29,10 +26,15 @@ export default function Home() {
     const starsFrontMoveSpeed = 0.5;
     const starsBackMoveSpeed = 0.4;
     const starsBackOpacity = 0.4;
-    const mandelbrotWidth = Math.max(window.screen.availWidth, window.screen.height);
-    const mandelbrotHeight = mandelbrotWidth;
+    var mandelbrotWidth = 0;
+    var mandelbrotHeight = mandelbrotWidth;
 
     useEffect(() => {
+        mandelbrotWidth = Math.max(window.screen.availWidth, window.screen.height);
+        mandelbrotHeight = mandelbrotWidth;
+
+        setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
+
         const onresize = () => {
             setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
         };
@@ -112,10 +114,9 @@ export default function Home() {
                 factor={0}
                 style={{ marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
                 >
-            <img 
-                onClick={() => window.location.href = "https://github.com/niooii"} 
-                src={"icons/github-white.svg"} 
-                />
+                <Link href="https://github.com/niooii" target="_blank" rel="noopener noreferrer">
+                    <img src={"icons/github-white.svg"} alt="GitHub Profile" />
+                </Link>
             </ParallaxLayer>
 
             <ParallaxLayer offset={1} speed={0.8} style={{ opacity: 0.1 }}>
@@ -326,28 +327,32 @@ export default function Home() {
                 </h1>
             </ParallaxLayer>
 
-            <ParallaxLayer 
-                offset={3.7} 
-                factor={0}
-                speed={2} 
-                style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}  
-                >
-            <img 
-                onClick={() => window.location.href = "https://discord.com/users/381851699763216386"} 
-                src={"icons/discord.svg"} 
-                />
+            <ParallaxLayer
+            offset={3.7}
+            factor={0}
+            speed={2}
+            style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}
+            >
+                <Link href="https://discord.com/users/381851699763216386" target="_blank" rel="noopener noreferrer">
+                    <img
+                    src={"icons/discord.svg"}
+                    alt="Discord Profile"
+                    />
+                </Link>
             </ParallaxLayer>
 
-            <ParallaxLayer 
-                offset={3.3} 
-                factor={0}
-                speed={2.4} 
-                style={{ width: '10%', height: '5%', marginLeft: '20%', cursor: "pointer", zIndex: 99 }}  
-                >
-            <img 
-                onClick={() => window.location.href = "https://discord.com/users/381851699763216386"} 
-                src={"icons/google-gmail.svg"} 
-                />
+            <ParallaxLayer
+            offset={3.3}
+            factor={0}
+            speed={2.4}
+            style={{ width: '10%', height: '5%', marginLeft: '20%', cursor: "pointer", zIndex: 99 }}
+            >
+                <Link href="https://discord.com/users/381851699763216386" target="_blank" rel="noopener noreferrer">
+                    <img
+                    src={"icons/google-gmail.svg"}
+                    alt="Gmail Contact"
+                    />
+                </Link>
             </ParallaxLayer>
         </Parallax>
     </div>
