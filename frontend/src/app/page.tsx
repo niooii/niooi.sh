@@ -124,11 +124,6 @@ export default function Home() {
                 </Link>
             </ParallaxLayer>
 
-            <ParallaxLayer offset={1} speed={0.8} style={{ opacity: 0.1 }}>
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '55%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '10%', marginLeft: '15%' }} />
-            </ParallaxLayer>
-
             <ParallaxLayer offset={2.93} speed={1}>
                 <p className="text-xl italic font-medium">The julia set parameterized in 6d. Move your mouse!</p>
             </ParallaxLayer>
@@ -144,7 +139,7 @@ export default function Home() {
                     height={mandelbrotHeight} 
                 />
             </ParallaxLayer>
-
+{/* 
             <ParallaxLayer offset={1} speed={0.5} style={{ opacity: 0.1 }}>
                 <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' }} />
                 <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '40%' }} />
@@ -164,7 +159,13 @@ export default function Home() {
             <ParallaxLayer offset={2.6} speed={0.4} style={{ opacity: 0.6 }}>
                 <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '5%' }} />
                 <img src={"sprites/snow.png"} style={{ display: 'block', width: '15%', marginLeft: '75%' }} />
+            </ParallaxLayer> 
+            
+            <ParallaxLayer offset={1} speed={0.8} style={{ opacity: 0.1 }}>
+                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '55%' }} />
+                <img src={"sprites/snow.png"} style={{ display: 'block', width: '10%', marginLeft: '15%' }} />
             </ParallaxLayer>
+            */}
 
             <ParallaxLayer
                 offset={2}
@@ -211,12 +212,12 @@ export default function Home() {
                     justifyContent: 'space-between',
                     alignItems: 'center', 
                 }}>
-                    <img src={"vercel.svg"} style={{ width: '20%' }} />
+                    {/* <img src={"vercel.svg"} style={{ width: '20%' }} /> */}
                     <h1 
                         className="pt-8 text-center text-viewport-10 font-semibold">
-                        Hey, it's nioon
+                        Hey, I'm Hewitt
                     </h1>
-                    <p className="text-viewport-3">I'm a CS + math major, and I'm addicted to making stuff</p>
+                    <p className="text-viewport-3">I'm a CS + Math major, and I like making things</p>
                     <p className="text-viewport-2 text-gray-300">[click me! or don't, you can just scroll]</p>
                 </div>
             </ParallaxLayer>
@@ -232,7 +233,7 @@ export default function Home() {
             
             {/* Projects */}
             <ParallaxLayer
-                offset={1}
+                offset={0.75}
                 speed={0.1}
                 onClick={() => parallax.current.scrollTo(2)}
                 style={{
@@ -290,11 +291,11 @@ export default function Home() {
                 factor={0}
                 style={{
                     marginLeft: '10%',
-                    opacity: '70%'
+                    opacity: '100%'
                 }}
             >
                 <ProjectCard
-                    title="Jupiter Ed App"
+                    title="Grades Viewer"
                     imageUrl="projects/jupiter.gif"
                     technologies={['rust', 'java', 'flutter']}
                     githubLink="https://github.com/niooii/jupitered-frontend"
@@ -312,11 +313,18 @@ export default function Home() {
                 }}
             >
                 <ProjectCard
+                    title="YOLO CV"
+                    imageUrl="projects/cv.gif"
+                    technologies={['unity', 'python']}
+                    githubLink="https://github.com/BinghamtonRover/Rover-Code"
+                    width={25}
+                />
+                {/* <ProjectCard
                     title="Onion OS"
                     imageUrl="projects/onion-os-small.gif"
                     technologies={['C', 'rust']}
                     githubLink="https://github.com/niooii/onion-os"
-                />
+                /> */}
             </ParallaxLayer>
             
             {/* Socials */}

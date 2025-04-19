@@ -85,11 +85,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* Technology icons */}
       {technologies.length > 0 && (
         <div 
-          className={`absolute z-20 flex ${isPortrait ? 'flex-col' : ''}`}
+          className={`absolute z-20 flex ${isPortrait ? 'flex-col' : ''} transition-opacity duration-300 ease-in-out`}
           style={{ 
             left: isPortrait ? '-1rem' : '0.75rem',
             top: isPortrait ? '0.5rem' : '0',
-            transform: isPortrait ? 'none' : 'translateY(-50%)'
+            transform: isPortrait ? 'none' : 'translateY(-50%)',
+            opacity: isHovered ? 1 : 0,  // Control visibility with opacity
           }}
         >
           {technologies.map((tech, index) => (
@@ -98,7 +99,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               className="rounded-full bg-white bg-opacity-90 shadow-md flex items-center justify-center border border-gray-300 transition-transform group-hover:scale-105"
               style={{ 
                 marginLeft: isPortrait ? 0 : index === 0 ? 0 : '0.75rem',
-                marginTop: isPortrait ? (index === 0 ? 0 : '0.5rem') : 0,
+                marginTop: isPortrait ? (index === 0 ? 0 : '0.75rem') : 0,
                 width: `2.2rem`,
                 height: `2.3rem`,
               }}

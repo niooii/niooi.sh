@@ -26,5 +26,5 @@ export const useSmoothMouse = (smoothFactor = 0.1) => {
       return () => cancelAnimationFrame(animationFrame);
     }, [smoothFactor]);
   
-    return positionRef; // Return the ref directly
+    return positionRef; 
   };
