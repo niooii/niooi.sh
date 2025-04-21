@@ -20,11 +20,11 @@ export enum Tech {
 
 export enum ProjectCategory {
     SYSTEMS_PROGRAMMING = "Systems Programming",
-    GAME_DEV = "Graphicps/Game dev",
+    GAME_DEV = "Graphics/Games",
     FUNCTIONAL = "Functional",
     AI_ML = "AI & ML",
-    WEB_DEV = "Web dev",
-    APP_DEV = "App dev",
+    WEB_DEV = "Web",
+    APP_DEV = "Apps",
     DATA_SCIENCE = "Data Science",
     DEVOPS = "DevOps",
     SECURITY = "Security"
