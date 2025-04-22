@@ -28,6 +28,8 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
     const getNodeId = (node: ProjectGraphNode): string => 
         typeof node.data !== "string" ? `project-${(node.data as Project).name}` : `category-${node.data as ProjectCategory}`;
 
+    const startTimeRef = useRef<number>(Date.now());
+    
     useEffect(() => {
         if (!parallaxRef.current || !canvasRef.current) return;
         
@@ -44,10 +46,9 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
         window.addEventListener("resize", updateCanvasSize);
         
         let animationFrame: number;
-        let startTime = Date.now();
         
         const drawEdges = () => {
-            const time = (Date.now() - startTime) / 1000;
+            const time = (Date.now() - startTimeRef.current) / 1000;
             setAnimationTime(time);
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -163,18 +164,33 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
         radius: Math.random() * 2 + 3 
     }))).current;
 
+    const getTooltipPosition = (nodeId: string) => {
+        const nodePosition = nodePositions[nodeId];
+        if (!nodePosition) return {};
+        
+        const isOnLeft = nodePosition.x < window.innerWidth / 2;
+        const isOnTop = nodePosition.y < window.innerHeight / 2;
+        
+        return {
+            position: "absolute",
+            left: `${nodePosition.x}px`,
+            top: `${nodePosition.y}px`,
+            transform: `translate(${!isOnLeft ? "25%" : "-125%"}, ${!isOnTop ? "25%" : "-125%"})`,
+            textAlign: isOnLeft ? "left" : "right",
+            whiteSpace: "nowrap"
+        };
+    };
+
     const renderPopup = () => {
-        const project = (hoveredNode?.data as Project);
+        var project: Project | null = null;
+        var nodeId: string = "";
+        var tooltipStyles;
 
-        var nodePosition;
-        var isOnLeft;
-        // fighting demons with type checker
         if (hoveredNode) {
-            const nodeId = getNodeId(hoveredNode);
-            nodePosition = nodePositions[nodeId];
+            project = (hoveredNode?.data as Project);
+            nodeId = getNodeId(hoveredNode);
+            tooltipStyles = getTooltipPosition(nodeId);
         }
-
-        isOnLeft = nodePosition ? nodePosition?.x < window.innerWidth / 2 : undefined;
         
         return ReactDOM.createPortal(
             <>
@@ -182,7 +198,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                 <div
                     className="fixed inset-0 bg-black z-50 transition-opacity duration-300 pointer-events-none" 
                     style={{ 
-                        opacity: hoveredNode ? 0.5 : 0,
+                        opacity: hoveredNode ? (lockedIn ? 0.5 : 0.7) : 0,
                         pointerEvents: lockedIn ? "auto" : "none"
                     }}
                     onClick={() => {
@@ -199,34 +215,46 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                         pointerEvents: "none",
                     }}
                 >
-                    {hoveredNode && (<div 
+                    {hoveredNode && (
+                        <p 
+                            className="font-semibold absolute transition-all text-viewport-[1.8] pointer-events-none"
+                            style={{ 
+                                opacity: lockedIn ? 0 : 1,
+                                ...tooltipStyles
+                            }}
+                        >
+                            [click for more]
+                        </p>
+                    )}
+
+                    {(hoveredNode && nodeId && project) && (<div 
                         className="rounded-2xl shadow-lg p-6 pointer-events-auto transform transition-all duration-300 ease-out"
                         style={{
                             backgroundColor: `rgb(9 9 11 / ${lockedIn ? 0.96 : 0.6})`,
                             width: `${lockedIn ? 40 : 30}vw`,
-                            position: 'absolute',
+                            position: "absolute",
                             top: 0,
                             bottom: 0,
-                            margin: 'auto',
-                            height: 'fit-content',
+                            margin: "auto",
+                            height: "fit-content",
                             transform: lockedIn 
-                                ? 'translate(-50%, 0)' 
+                                ? "translate(-50%, 0)" 
                                 : `translate(0, 0)`,
                             left: lockedIn 
-                                ? '50%' 
-                                : isOnLeft 
-                                    ? `${nodePosition!.x + 50}px` 
-                                    : `${nodePosition!.x - 50 - (lockedIn ? 40 : 30) * window.innerWidth / 100}px`
+                                ? "50%" 
+                                : nodePositions[nodeId]?.x < window.innerWidth / 2
+                                    ? `${nodePositions[nodeId]?.x + 50}px` 
+                                    : `${nodePositions[nodeId]?.x - 50 - (lockedIn ? 40 : 30) * window.innerWidth / 100}px`
                         }}
                     >
                         {project.imageUrl && (
                             <div 
                                 className="m-5 mb-4 overflow-hidden"
                                 style={{ 
-                                    display: 'flex', 
-                                    flexDirection: 'column',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center', 
+                                    display: "flex", 
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                    alignItems: "center", 
                                 }}
                             >
                                 <img 
@@ -240,11 +268,6 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                         <h3 className="text-viewport-3 font-semibold block text-center">{project.name}</h3>
                         
                         <p className="text-viewport-[2] italic block text-center">{project.description}</p>
-                        
-                        <p 
-                            className="transition-all text-viewport-[1.8] block text-center"
-                            style={{ opacity: lockedIn ? 0 : 1 }}
-                        >[click this node to learn more]</p>
                         
                         <p 
                             className="transition-all text-red-500 text-viewport-[1.8] block text-center"
@@ -261,6 +284,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
         <>
             {/* Render nodes */}
             {nodes.map((node, index) => {
+                // apply the little floating effects
                 const nodeId = getNodeId(node);
                 const isCategory = typeof node.data === "string";
                 
@@ -269,8 +293,11 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                 
                 if (!isCategory) {
                     const params = nodeAnimationParams[index];
-                    floatX = Math.sin(animationTime * params.xFreq + params.xPhase) * params.radius;
-                    floatY = Math.cos(animationTime * params.yFreq + params.yPhase) * params.radius;
+
+                    const effectRadius = params.radius
+                    
+                    floatX = Math.sin(animationTime * params.xFreq + params.xPhase) * effectRadius;
+                    floatY = Math.cos(animationTime * params.yFreq + params.yPhase) * effectRadius;
                 }
                 
                 return (
@@ -306,37 +333,50 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                 </div>
                             ) : (
                                 // Project node
+                                // invisible border around it that triggers on hover
                                 <div
-                                    id={nodeId}
-                                    className="transition-all duration-300 ease-out hover:scale-110"
                                     style={{
-                                        width: "1.6vw",
-                                        height: "1.6vw",
-                                        borderRadius: "50%",
+                                        width: "3.2vw",
+                                        height: "3.2vw", 
+                                        position: "relative",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        boxShadow: hoveredNode && (node.data as Project).name === (hoveredNode.data as Project).name 
-                                            ? "0 0 2vw rgba(255,221,33,1)" // yellow aura
-                                            : "0 0 1vw rgba(255,255,255,0.7)", // white aura
-                                        cursor: "pointer",
-                                        background: hoveredNode && (node.data as Project).name === (hoveredNode.data as Project).name 
-                                            ? "#000000" 
-                                            : "#FFFFFF",
                                         transform: `translate(${floatX}px, ${floatY}px)`,
+                                        pointerEvents: "auto",
                                         zIndex: hoveredNode && (node.data as Project).name === (hoveredNode.data as Project).name ? 50 : 2
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        setHoveredNode(node);
                                     }}
                                     onMouseLeave={() => {
                                         if (!lockedIn) 
                                             setHoveredNode(null);
                                     }}
-                                    onClick={() => {
-                                        setLockedIn(true);
-                                    }}
                                 >
+                                    <div
+                                        id={nodeId}
+                                        className="transition-all duration-300 ease-out hover:scale-110"
+                                        style={{
+                                            width: "1.6vw",
+                                            height: "1.6vw",
+                                            borderRadius: "50%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            boxShadow: hoveredNode && (node.data as Project).name === (hoveredNode.data as Project).name 
+                                                ? "0 0 2vw rgba(255,221,33,1)" // yellow aura
+                                                : "0 0 1vw rgba(255,255,255,0.7)", // white aura
+                                            cursor: "pointer",
+                                            background: hoveredNode && (node.data as Project).name === (hoveredNode.data as Project).name 
+                                                ? "#000000" 
+                                                : "#FFFFFF",
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            setHoveredNode(node);
+                                        }}
+                                        onClick={() => {
+                                            setLockedIn(true);
+                                        }}
+                                    >
+                                    </div>
                                 </div>
                             )}
                         </div>
