@@ -19,7 +19,7 @@ interface ProjectGraphProps {
 }
 
 const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasRef }) => {
-    const [currentProjNode, setCurrentProjNode] = useState<Project>();
+    const [initialHoverSide, setInitialHoverSide] = useState<{ left: boolean, top: boolean } | null>(null);
     const [animationTime, setAnimationTime] = useState(0);
     const [hoveredNode, setHoveredNode] = useState<ProjectGraphNode | null>(null);
     const [lockedIn, setLockedIn] = useState<boolean>(false);
@@ -168,8 +168,8 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
         const nodePosition = nodePositions[nodeId];
         if (!nodePosition) return {};
         
-        const isOnLeft = nodePosition.x < window.innerWidth / 2;
-        const isOnTop = nodePosition.y < window.innerHeight / 2;
+        const isOnLeft = initialHoverSide?.left;
+        const isOnTop = initialHoverSide?.top;
         
         return {
             position: "absolute",
@@ -228,7 +228,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                     )}
 
                     {(hoveredNode && nodeId && project) && (<div 
-                        className="rounded-2xl shadow-lg p-6 pointer-events-auto transform transition-all duration-300 ease-out"
+                        className="rounded-2xl shadow-lg p-6 pointer-events-auto [transition:scale_1s,translate_2s] ease-out"
                         style={{
                             backgroundColor: `rgb(9 9 11 / ${lockedIn ? 0.96 : 0.6})`,
                             width: `${lockedIn ? 40 : 30}vw`,
@@ -242,7 +242,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                 : `translate(0, 0)`,
                             left: lockedIn 
                                 ? "50%" 
-                                : nodePositions[nodeId]?.x < window.innerWidth / 2
+                                : initialHoverSide?.left
                                     ? `${nodePositions[nodeId]?.x + 50}px` 
                                     : `${nodePositions[nodeId]?.x - 50 - (lockedIn ? 40 : 30) * window.innerWidth / 100}px`
                         }}
@@ -347,8 +347,10 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                         zIndex: hoveredNode && (node.data as Project).name === (hoveredNode.data as Project).name ? 50 : 2
                                     }}
                                     onMouseLeave={() => {
-                                        if (!lockedIn) 
+                                        if (!lockedIn) {
                                             setHoveredNode(null);
+                                            setInitialHoverSide(null); 
+                                        }
                                     }}
                                 >
                                     <div
@@ -370,6 +372,13 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                                 : "#FFFFFF",
                                         }}
                                         onMouseEnter={(e) => {
+                                            const nodePos = nodePositions[nodeId];
+                                            if (nodePos) {
+                                                setInitialHoverSide({
+                                                    left: nodePos.x < window.innerWidth / 2,
+                                                    top: nodePos.y < window.innerHeight / 2
+                                                });
+                                            }
                                             setHoveredNode(node);
                                         }}
                                         onClick={() => {
