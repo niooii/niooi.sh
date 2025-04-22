@@ -9,16 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.10",
     "@react-spring/parallax": "^9.7.5",
     "@types/d3": "^7.4.3",
     "battlezone-shapes": "^2.0.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "d3": "^7.9.0",
+    "lucide-react": "^0.503.0",
     "next": "15.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-force-graph-2d": "^1.27.1",
     "react-parallax": "^3.5.1",
-    "react-sizeme": "^3.0.2"
+    "react-sizeme": "^3.0.2",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

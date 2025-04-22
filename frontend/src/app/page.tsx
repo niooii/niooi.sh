@@ -2,10 +2,9 @@
 
 import ProjectCard from "@/components/project_card";
 import ProjectsGraph, { ProjectGraphNode } from "@/components/projects_graph";
-import Mandelbrot from "@/components/vfx/mandelbrot";
-import { useSmoothMouse } from "@/hooks/smooth_mouse";
+import TimeCounter from "@/components/time_counter";
 import { FileSystem, Path } from "@/lib/filesystem";
-import { ProjectCategory, Tech } from "@/lib/project";
+import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, NIOOI_SH, YOLO_CV } from "@/lib/project";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -17,10 +16,11 @@ export default function Home() {
     const [isClientReady, setIsClientReady] = useState(false);
     const [mandelbrotWidth, setMandelbrotWidth] = useState(0);
     const [mandelbrotHeight, setMandelbrotHeight] = useState(0);
+    const parallax = useRef<IParallax>(null!)
+    const [scrollProgress, setScrollProgress] = useState(0);
     
     useEffect(() => {
         const fs = fsRef.current;
-
         fs.makeDir(new Path("/home"));
         fs.makeDir(new Path("/home/niooi"));
         let exec = fs.makeFile(new Path("/home/niooi/testexecutable"));
@@ -29,190 +29,135 @@ export default function Home() {
     }, []);
 
     const projectGraphNodes: ProjectGraphNode[] = [
-        // Project nodes
         {
-          data: {
-            id: 1,
-            name: "Procedural level generation",
-            description: "Procedural IKEA level generator with path-finding and room layout algorithms",
-            categories: [ProjectCategory.GAME_DEV],
-            imageUrl: "projects/procedural_gen.gif",
-            usedTech: [Tech.RUST, Tech.CSHARP, Tech.UNITY],
-            githubLink: "https://github.com/niooii/procedural-ikea-generation"
-          },
-          xOffset: 0.35, // Converted from marginLeft: '20%'
-          yOffset: 1.34,
-          type: "proj"
+            data: IKEA_GAME,
+            xOffset: 0.37,
+            yOffset: 1.34,
         },
         {
-          data: {
-            id: 2,
-            name: "GDF",
-            description: "Graphics framework built with Vulkan, C and C++",
-            categories: [ProjectCategory.SYSTEMS_PROGRAMMING, ProjectCategory.GAME_DEV],
-            imageUrl: "projects/gdf.gif",
-            usedTech: [Tech.C, Tech.CPP, Tech.VULKAN],
-            githubLink: "https://github.com/niooii/gdf"
-          },
-          xOffset: 0.3, 
-          yOffset: 1.65,
-          type: "proj"
+            data: GDF,
+            xOffset: 0.3,
+            yOffset: 1.65,
         },
         {
-          data: {
-            id: 3,
-            name: "Grades Viewer",
-            description: "Mobile app for viewing school grades and assignments",
-            categories: [ProjectCategory.APP_DEV, ProjectCategory.WEB_DEV],
-            imageUrl: "projects/jupiter.gif",
-            usedTech: [Tech.RUST, Tech.JAVA, Tech.FLUTTER],
-            githubLink: "https://github.com/niooii/jupitered-frontend"
-          },
-          xOffset: 0.5, 
-          yOffset: 1.7,
-          type: "proj"
+            data: JUPITER_ED,
+            xOffset: 0.5,
+            yOffset: 1.7,
         },
         {
-          data: {
-            id: 4,
-            name: "YOLO CV",
-            description: "Computer vision system using YOLO object detection",
-            categories: [ProjectCategory.AI_ML, ProjectCategory.APP_DEV],
-            imageUrl: "projects/cv.gif",
-            usedTech: [Tech.UNITY, Tech.PYTHON],
-            githubLink: "https://github.com/BinghamtonRover/Rover-Code"
-          },
-          xOffset: 0.6, // Converted from marginLeft: '-30%'
-          yOffset: 1.3,
-          type: "proj"
+            data: YOLO_CV,
+            xOffset: 0.6,
+            yOffset: 1.3,
         },
         {
-          data: {
-            id: 5,
-            name: "Onion OS",
-            description: "Custom operating system kernel written in Rust and C",
-            categories: [ProjectCategory.SYSTEMS_PROGRAMMING],
-            imageUrl: "projects/onion-os-small.gif",
-            usedTech: [Tech.C, Tech.RUST],
-            githubLink: "https://github.com/niooii/onion-os"
-          },
-          xOffset: 0.2, // Same as parent layer
-          yOffset: 1.4 , // Slightly offset from the previous project
-          type: "proj" 
+            data: ONION_OS,
+            xOffset: 0.1,
+            yOffset: 1.4,
         },
         {
-          data: {
-            id: 6,
-            name: "Music Language Parser",
-            description: "A parser",
-            categories: [ProjectCategory.FUNCTIONAL],
-            imageUrl: "projects/onion-os-small.gif",
-            usedTech: [Tech.HASKELL],
-            githubLink: "https://github.com/niooii/onion-os"
-          },
-          xOffset: 0.8,
-          yOffset: 1.8 ,
-          type: "proj" 
+            data: MUSIC_LANG,
+            xOffset: 0.8,
+            yOffset: 1.8,
         },
         {
-          data: {
-            id: 7,
-            name: "This Website",
-            description: "Ahahah...",
-            categories: [ProjectCategory.WEB_DEV],
-            imageUrl: "projects/onion-os-small.gif",
-            usedTech: [Tech.C],
-            githubLink: "https://github.com/niooii/niooi.sh"
-          },
-          xOffset: 0.66,
-          yOffset: 1.8 ,
-          type: "proj" 
+            data: NIOOI_SH,
+            xOffset: 0.66,
+            yOffset: 1.8,
+        },
+        {
+            data: FLYING_HORSE,
+            xOffset: 0.2,
+            yOffset: 1.37,
         },
         {
           data: ProjectCategory.SYSTEMS_PROGRAMMING,
           xOffset: 0.15,
           yOffset: 1.7,
-          type: "cat"
         },
         {
           data: ProjectCategory.GAME_DEV,
           xOffset: 0.3,
           yOffset: 1.5,
-          type: "cat"
         },
         {
           data: ProjectCategory.APP_DEV,
           xOffset: 0.45,
           yOffset: 1.4,
-          type: "cat"
         },
         {
           data: ProjectCategory.WEB_DEV,
           xOffset: 0.6,
           yOffset: 1.6,
-          type: "cat"
         },
         {
           data: ProjectCategory.AI_ML,
           xOffset: 0.75,
           yOffset: 1.4,
-          type: "cat"
         },
         {
           data: ProjectCategory.FUNCTIONAL,
           xOffset: 0.85,
           yOffset: 1.65,
-          type: "cat"
         }
       ];
-      
 
-    const parallax = useRef<IParallax>(null!)
     const starsFrontMoveSpeed = 0.55;
     const starsBackMoveSpeed = 0.4;
     const starsBackOpacity = 0.4;
 
+    // useEffect(() => {
+    //     const width = Math.max(window.screen.availWidth, window.screen.height);
+
+    //     setMandelbrotWidth(width);
+    //     setMandelbrotHeight(width);
+
+    //     setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
+
+    //     setIsClientReady(true);
+
+    //     const onresize = () => {
+    //         setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
+    //     };
+
+    //     addEventListener("resize", onresize);
+    //     return () => window.removeEventListener("resize", onresize);
+    // }, [])
+
+    const handleScroll = () => {
+        console.log("HEY world")
+        const _scrollProgress = parallax.current.current / parallax.current.space
+        console.log(_scrollProgress);
+        setScrollProgress(1)
+    }
     useEffect(() => {
-        const width = Math.max(window.screen.availWidth, window.screen.height);
+        const container = parallax.current?.container
+            .current as HTMLDivElement
 
-        setMandelbrotWidth(width);
-        setMandelbrotHeight(width);
-
-        setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
-
-        setIsClientReady(true);
-
-        const onresize = () => {
-            setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
-        };
-
-        addEventListener("resize", onresize);
-        return () => window.removeEventListener("resize", onresize);
+        container.onscroll = handleScroll;
     }, [])
-
     return (
-        <div style={{ userSelect: 'none', width: '100%', height: '100%', background: '#253237' }}>
+        <div style={{ userSelect: "none", width: "100%", height: "100%", background: "#253237" }}>
         <canvas
             ref={globalCanvasRef}
             style={{
-                position: 'fixed',
+                position: "fixed",
                 top: 0,
                 left: 0,
-                width: '100%',
-                height: '100%',
-                pointerEvents: 'none',
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
                 zIndex: -1
             }}
         />
         <Parallax ref={parallax} pages={4}>
             <ParallaxLayer
-                offset={1}
-                factor={3}
+                offset={0}
+                factor={1}
                 speed={1}
-                className="bg-gradient-to-b from-transparent via-zinc-950/100 to-zinc-950/100"
+                className="bg-black"
             />
-            <ParallaxLayer offset={2} speed={1} onClick={() => parallax.current.scrollTo(0)} />
-            <ParallaxLayer offset={3} speed={1} className="bg-zinc-950" />
+            <ParallaxLayer offset={2} factor={2} speed={1} className="bg-black" />
+            <ParallaxLayer offset={3} factor={1} speed={1} className="bg-zinc-950" />
             
             {/* Star backgrounds */}
             <ParallaxLayer
@@ -221,8 +166,8 @@ export default function Home() {
                 factor={3}
                 style={{
                     backgroundImage: "url(stars.svg)",
-                    backgroundRepeat: 'repeat-y',
-                    backgroundSize: 'cover',
+                    backgroundRepeat: "repeat-y",
+                    backgroundSize: "cover",
                 }}
             / >
            
@@ -232,10 +177,10 @@ export default function Home() {
                 factor={3}
                 style={{
                     backgroundImage: "url(stars.svg)",
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'repeat-y',
-                    marginTop: '-20%',
-                    marginLeft: '-3%',
+                    backgroundSize: "cover",
+                    backgroundRepeat: "repeat-y",
+                    marginTop: "-20%",
+                    marginLeft: "-3%",
                     opacity: starsBackOpacity
                 }}
             / >
@@ -247,8 +192,8 @@ export default function Home() {
                 factor={3}
                 style={{
                     backgroundImage: "url(stars.svg)",
-                    backgroundRepeat: 'repeat-y',
-                    backgroundSize: 'cover',
+                    backgroundRepeat: "repeat-y",
+                    backgroundSize: "cover",
                 }}
             / >
            
@@ -258,27 +203,15 @@ export default function Home() {
                 factor={3}
                 style={{
                     backgroundImage: "url(stars.svg)",
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'repeat-y',
-                    marginTop: '-20%',
-                    marginLeft: '-3%',
+                    backgroundSize: "cover",
+                    backgroundRepeat: "repeat-y",
+                    marginTop: "-20%",
+                    marginLeft: "-3%",
                     opacity: starsBackOpacity
                 }}
             / >
-            
-            {/* Github floating thingy */}
-            <ParallaxLayer 
-                offset={0.6} 
-                speed={-0.45} 
-                factor={0}
-                style={{ marginLeft: '15%', cursor: "pointer", zIndex: 99 }}  
-                >
-                <Link href="https://github.com/niooii" target="_blank" rel="noopener noreferrer">
-                    <img src={"icons/github-white.svg"} alt="GitHub Profile" />
-                </Link>
-            </ParallaxLayer>
 
-            <ParallaxLayer offset={2.93} speed={1}>
+            {/* <ParallaxLayer offset={2.93} speed={1}>
                 <p className="text-xl italic font-medium">The julia set parameterized in 6d. Move your mouse!</p>
             </ParallaxLayer>
 
@@ -292,32 +225,32 @@ export default function Home() {
                     width={mandelbrotWidth} 
                     height={mandelbrotHeight} 
                 />
-            </ParallaxLayer>
+            </ParallaxLayer> */}
 {/* 
             <ParallaxLayer offset={1} speed={0.5} style={{ opacity: 0.1 }}>
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '40%' }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "20%", marginLeft: "70%" }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "20%", marginLeft: "40%" }} />
             </ParallaxLayer>
 
             <ParallaxLayer offset={1} speed={0.2} style={{ opacity: 0.2 }}>
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '10%', marginLeft: '10%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '75%' }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "10%", marginLeft: "10%" }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "20%", marginLeft: "75%" }} />
             </ParallaxLayer>
 
             <ParallaxLayer offset={1.6} speed={-0.1} style={{ opacity: 0.4 }}>
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '60%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '25%', marginLeft: '30%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '10%', marginLeft: '80%' }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "20%", marginLeft: "60%" }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "25%", marginLeft: "30%" }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "10%", marginLeft: "80%" }} />
             </ParallaxLayer>
 
             <ParallaxLayer offset={2.6} speed={0.4} style={{ opacity: 0.6 }}>
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '5%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '15%', marginLeft: '75%' }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "20%", marginLeft: "5%" }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "15%", marginLeft: "75%" }} />
             </ParallaxLayer> 
             
             <ParallaxLayer offset={1} speed={0.8} style={{ opacity: 0.1 }}>
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '20%', marginLeft: '55%' }} />
-                <img src={"sprites/snow.png"} style={{ display: 'block', width: '10%', marginLeft: '15%' }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "20%", marginLeft: "55%" }} />
+                <img src={"sprites/snow.png"} style={{ display: "block", width: "10%", marginLeft: "15%" }} />
             </ParallaxLayer>
             */}
 
@@ -325,9 +258,9 @@ export default function Home() {
                 offset={2}
                 speed={-0.3}
                 style={{
-                    backgroundSize: '80%',
-                    backgroundPosition: 'center',
-                    // backgroundImage: url('clients', true),
+                    backgroundSize: "80%",
+                    backgroundPosition: "center",
+                    // backgroundImage: url("clients", true),
                 }}
             />
 
@@ -336,14 +269,14 @@ export default function Home() {
                 offset={0}
                 speed={0.1}
                 style={{
-                    display: 'flex',
-                    justifyContent: 'center',
+                    display: "flex",
+                    justifyContent: "center",
                 }}>
                 <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    alignItems: 'center', 
+                    display: "flex", 
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center", 
                 }}>
                     <h1 
                         className="pt-8 text-center text-viewport-6 font-semibold">
@@ -356,22 +289,22 @@ export default function Home() {
                 speed={0.1}
                 onClick={() => parallax.current.scrollTo(1)}
                 style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}>
                 <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    alignItems: 'center', 
+                    display: "flex", 
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center", 
                 }}>
-                    {/* <img src={"vercel.svg"} style={{ width: '20%' }} /> */}
+                    {/* <img src={"vercel.svg"} style={{ width: "20%" }} /> */}
                     <h1 
                         className="pt-8 text-center text-viewport-10 font-semibold">
-                        Hey, I'm Hewitt
+                        Hey, I"m Hewitt
                     </h1>
-                    <p className="text-viewport-3">I'm a CS + Math major, and I like making things</p>
+                    <p className="text-viewport-3">I"m a CS + Math major, and I like making things</p>
                     <p className="text-viewport-2 text-gray-300">[click anywhere]</p>
                 </div>
             </ParallaxLayer>
@@ -380,27 +313,36 @@ export default function Home() {
                 offset={0}
                 speed={0.9}
                 style={{
-                    pointerEvents: 'none',
+                    pointerEvents: "none",
             }}>
-                {/* <img className="rounded-md" src={"akaricough.png"} style={{ display: 'block', width: '20%', marginLeft: '70%' , marginTop: '10%' }} /> */}
+                {/* <img className="rounded-md" src={"akaricough.png"} style={{ display: "block", width: "20%", marginLeft: "70%" , marginTop: "10%" }} /> */}
             </ParallaxLayer>
             
             {/* Projects */}
             <ParallaxLayer
-                offset={0.75}
+                offset={1}
                 speed={0.1}
                 onClick={() => parallax.current.scrollTo(2)}
                 style={{
                     zIndex: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}>
-                {/* <img src={"next.svg"} style={{ width: '40%' }} /> */}
-                <h1 
-                    className="text-center text-viewport-8 font-semibold">
-                    Some things I've worked on.
-                </h1>
+                <div style={{ 
+                    marginTop: "-35%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}>
+                    {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
+                    <h1 
+                        className="text-center text-viewport-8 font-semibold">
+                        Some things I've worked on.
+                    </h1>
+                    <p className="text-viewport-2 text-gray-300">[Hover on a node]</p>
+                </div>
             </ParallaxLayer>
             <div >
                 <ProjectsGraph 
@@ -412,19 +354,47 @@ export default function Home() {
 
             {/* Background and work history */}
             <ParallaxLayer
-                offset={1.8}
-                speed={0.1}
-                onClick={() => parallax.current.scrollTo(2)}
+                offset={2}
+                speed={2}
+                factor={0.5}
+                onClick={() => parallax.current.scrollTo(2.5)}
                 style={{
-                    zIndex: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    zIndex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}>
-                {/* <img src={"next.svg"} style={{ width: '40%' }} /> */}
+                {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
                 <h1 
-                    className="text-center text-viewport-10 font-semibold">
-                    Education stuff
+                    className="text-center text-viewport-8 font-semibold"
+                    style={{
+                        marginTop: "-17%"
+                    }}
+                >
+                    Player Summary
+                </h1>
+            </ParallaxLayer>
+            <ParallaxLayer
+                offset={2.2}
+                speed={2.5}
+                factor={0}
+                style={{
+                    zIndex: 1,
+                }}>
+                <TimeCounter className="text-viewport-3 font-semibold block text-center" prefix="Total Playtime: " from={new Date(2006, 5, 22)}></TimeCounter>
+            </ParallaxLayer>
+            <ParallaxLayer
+                offset={2.3}
+                speed={2.5}
+                factor={0}
+                style={{
+                    zIndex: 1,
+                }}>
+                {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
+                <h1 
+                    className="text-center text-viewport-3 font-semibold"
+                >
+                    ???
                 </h1>
             </ParallaxLayer>
 
@@ -434,13 +404,18 @@ export default function Home() {
                 speed={1}
                 onClick={() => parallax.current.scrollTo(0)}
                 style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column"
                 }}>
                 <h1 
-                    className="text-center text-6xl font-semibold">
-                    Like what you see?
+                    className="text-center text-viewport-7 font-semibold">
+                    Need me for something?
+                </h1>
+                <h1 
+                    className="text-center text-viewport-2 font-light">
+                    ..anything?
                 </h1>
             </ParallaxLayer>
 
@@ -448,7 +423,7 @@ export default function Home() {
             offset={3.7}
             factor={0}
             speed={2}
-            style={{ width: '10%', height: '5%', marginLeft: '70%', cursor: "pointer", zIndex: 99 }}
+            style={{ width: "10%", height: "5%", marginLeft: "70%", cursor: "pointer", zIndex: 99 }}
             >
                 <Link href="https://discord.com/users/381851699763216386" target="_blank" rel="noopener noreferrer">
                     <img
@@ -457,18 +432,28 @@ export default function Home() {
                     />
                 </Link>
             </ParallaxLayer>
-
             <ParallaxLayer
             offset={3.3}
             factor={0}
             speed={2.4}
-            style={{ width: '10%', height: '5%', marginLeft: '20%', cursor: "pointer", zIndex: 99 }}
+            style={{ width: "10%", height: "5%", marginLeft: "20%", cursor: "pointer", zIndex: 99 }}
             >
                 <Link href="mailto:onioniwonpounoin@gmail.com" target="_blank" rel="noopener noreferrer">
                     <img
                     src={"icons/google-gmail.svg"}
                     alt="Gmail Contact"
                     />
+                </Link>
+            </ParallaxLayer>
+            {/* Github floating thingy */}
+            <ParallaxLayer 
+                offset={3.3} 
+                speed={2.1} 
+                factor={0}
+                style={{ width: "20%", height: "5%", marginLeft: "55%", cursor: "pointer", zIndex: 99 }}  
+                >
+                <Link href="https://github.com/niooii" target="_blank" rel="noopener noreferrer">
+                    <img src={"icons/github-white.svg"} alt="GitHub Profile" />
                 </Link>
             </ParallaxLayer>
         </Parallax>
