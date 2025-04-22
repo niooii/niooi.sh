@@ -302,9 +302,9 @@ export default function Home() {
                     {/* <img src={"vercel.svg"} style={{ width: "20%" }} /> */}
                     <h1 
                         className="pt-8 text-center text-viewport-10 font-semibold">
-                        Hey, I"m Hewitt
+                        Hey, I'm Hewitt
                     </h1>
-                    <p className="text-viewport-3">I"m a CS + Math major, and I like making things</p>
+                    <p className="text-viewport-3">I'm a CS + Math major, and I like making things</p>
                     <p className="text-viewport-2 text-gray-300">[click anywhere]</p>
                 </div>
             </ParallaxLayer>
