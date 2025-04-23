@@ -29,6 +29,20 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
         typeof node.data !== "string" ? `project-${(node.data as Project).name}` : `category-${node.data as ProjectCategory}`;
 
     const startTimeRef = useRef<number>(Date.now());
+
+    // hack to preload all images
+    useEffect(() => {
+        const projectNodes = nodes.filter(n => 
+            typeof n.data !== "string" && (n.data as Project).imageUrl
+        );
+        
+        projectNodes.forEach(node => {
+            const project = node.data as Project;
+            const img = new Image();
+            img.src = project.imageUrl!;
+            console.log("preloading img");
+        });
+    }, [nodes]); 
     
     useEffect(() => {
         if (!parallaxRef.current || !canvasRef.current) return;
@@ -260,7 +274,8 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                 <img 
                                     src={project.imageUrl} 
                                     alt={project.name}
-                                    className="rounded-xl object-cover w-[18vw]"
+                                    className="rounded-xl object-contain max-h-[50vh] max-w-[18vw]"
+                                    style={{ width: 'auto', height: 'auto' }}
                                 />
                             </div>
                         )}

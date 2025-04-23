@@ -8,6 +8,7 @@ import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, Project
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useMotionValue, motion, useTransform, useSpring } from "framer-motion"
 
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
@@ -17,7 +18,14 @@ export default function Home() {
     const [mandelbrotWidth, setMandelbrotWidth] = useState(0);
     const [mandelbrotHeight, setMandelbrotHeight] = useState(0);
     const parallax = useRef<IParallax>(null!)
-    const [scrollProgress, setScrollProgress] = useState(0);
+
+    const scrollProgress = useMotionValue(0);
+    // YES SMOOTH ROTATION FINALLY WORKS?
+    const smoothScrollProgress = useSpring(scrollProgress, {
+        bounce: 0,
+        damping: 20, 
+        mass: 0.1  
+    })
     
     useEffect(() => {
         const fs = fsRef.current;
@@ -122,19 +130,21 @@ export default function Home() {
     //     addEventListener("resize", onresize);
     //     return () => window.removeEventListener("resize", onresize);
     // }, [])
-
     const handleScroll = () => {
         console.log("HEY world")
         const _scrollProgress = parallax.current.current / parallax.current.space
         console.log(_scrollProgress);
-        setScrollProgress(1)
+        scrollProgress.set(_scrollProgress * 100);
+        console.log(scrollProgress);
     }
+
     useEffect(() => {
         const container = parallax.current?.container
             .current as HTMLDivElement
 
         container.onscroll = handleScroll;
     }, [])
+      
     return (
         <div style={{ userSelect: "none", width: "100%", height: "100%", background: "#253237" }}>
         <canvas
@@ -157,6 +167,15 @@ export default function Home() {
                 className="bg-black"
             />
             <ParallaxLayer offset={2} factor={2} speed={1} className="bg-black" />
+            {/* <ParallaxLayer offset={2} factor={2} speed={1} className="bg-black">
+                <motion.img 
+                    className="bg-white w-50 h-50"
+                    src="/projects/cv.gif"
+                    // smooth rotation test
+                    style={{ rotate: smoothScrollProgress }} 
+                >
+                </motion.img>
+            </ParallaxLayer> */}
             <ParallaxLayer offset={3} factor={1} speed={1} className="bg-zinc-950" />
             
             {/* Star backgrounds */}
