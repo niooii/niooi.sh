@@ -228,7 +228,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                     )}
 
                     {(hoveredNode && nodeId && project) && (<div 
-                        className="rounded-2xl shadow-lg p-6 pointer-events-auto [transition:scale_1s,translate_2s] ease-out"
+                        className="rounded-2xl shadow-lg p-6 pointer-events-auto trnasition-all duration-300 ease-out"
                         style={{
                             backgroundColor: `rgb(9 9 11 / ${lockedIn ? 0.96 : 0.6})`,
                             width: `${lockedIn ? 40 : 30}vw`,
