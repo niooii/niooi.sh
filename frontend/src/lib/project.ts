@@ -125,7 +125,8 @@ export const NIOOI_SH: Project = {
 export const FLYING_HORSE: Project = {
     name: "Flying horse",
     description: "A simulation/game in C++, built with SDL2",
-    summary: `My first non-trivial C++ program. Originally aimed to be a physics simulation but quickly 
+    summary: `My first non-trivial C++ program, and first introduction to many linear algebra & physics concepts.
+    Originally aimed to be a physics simulation but quickly 
     spun off into a game about a flying horse trying to break free from captivity. The game is mostly a simulation, 
     but you can activate the boss fight by pressing a certain key. The boss traps you in the window (yes, you as the user) until you either defeat him, 
     or die.`,
