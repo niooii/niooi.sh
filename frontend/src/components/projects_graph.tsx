@@ -22,6 +22,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
     const [initialHoverSide, setInitialHoverSide] = useState<{ left: boolean, top: boolean } | null>(null);
     const [animationTime, setAnimationTime] = useState(0);
     const [hoveredNode, setHoveredNode] = useState<ProjectGraphNode | null>(null);
+    const [lastHoveredNode, setLastHoveredNode] = useState<ProjectGraphNode | null>(null);
     const [lockedIn, setLockedIn] = useState<boolean>(false);
     const [nodePositions, setNodePositions] = useState<NodePositions>({});
     
@@ -197,6 +198,9 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
 
     const renderPopup = () => {
         var project: Project | null = null;
+        if (lastHoveredNode)
+            project = lastHoveredNode.data as Project;
+        
         var nodeId: string = "";
         var tooltipStyles;
 
@@ -205,7 +209,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
             nodeId = getNodeId(hoveredNode);
             tooltipStyles = getTooltipPosition(nodeId);
         }
-        
+
         return ReactDOM.createPortal(
             <>
                 {/* Background dimming */}
@@ -223,7 +227,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                 
                 {/* The popup with details */}
                 <div 
-                    className="fixed inset-0 flex items-center z-50 transition-opacity duration-300"
+                    className="fixed inset-0 flex items-center z-50 transition-all duration-300"
                     style={{ 
                         opacity: hoveredNode ? 1 : 0,
                         pointerEvents: "none",
@@ -242,15 +246,15 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                     )}
 
                     {(hoveredNode && nodeId && project) && (<div 
-                        className="rounded-2xl shadow-lg p-6 pointer-events-auto trnasition-all duration-300 ease-out"
+                        className="rounded-2xl shadow-lg p-6 pointer-events-auto transition-all duration-300 ease-out"
                         style={{
                             backgroundColor: `rgb(9 9 11 / ${lockedIn ? 0.96 : 0.6})`,
-                            width: `${lockedIn ? 40 : 30}vw`,
+                            width: `${lockedIn ? 80 : 30}vw`,
+                            height: lockedIn ? "80vh" : "fit-content",
                             position: "absolute",
                             top: 0,
                             bottom: 0,
                             margin: "auto",
-                            height: "fit-content",
                             transform: lockedIn 
                                 ? "translate(-50%, 0)" 
                                 : `translate(0, 0)`,
@@ -394,6 +398,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                                     top: nodePos.y < window.innerHeight / 2
                                                 });
                                             }
+                                            setLastHoveredNode(node);
                                             setHoveredNode(node);
                                         }}
                                         onClick={() => {

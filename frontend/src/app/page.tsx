@@ -170,7 +170,7 @@ export default function Home() {
             {/* <ParallaxLayer offset={2} factor={2} speed={1} className="bg-black">
                 <motion.img 
                     className="bg-white w-50 h-50"
-                    src="/projects/cv.gif"
+                    src="akaricough.png"
                     // smooth rotation test
                     style={{ rotate: smoothScrollProgress }} 
                 >
@@ -284,24 +284,62 @@ export default function Home() {
             />
 
             {/* Intro */}
+            {/* <ParallaxLayer
+                offset={0.1}
+                speed={1.6}
+                className="w-fit h-fit"
+                style={{
+                    marginLeft: "20%",
+                    zIndex: 2
+                }}
+                factor={0}
+            >
+                <h1 
+                    onClick={() => parallax.current.scrollTo(2)}
+                    className="w-fit h-fit transition-opacity duration-300 hover:opacity-50 cursor-pointer underline pt-8 text-viewport-2 font-semibold">
+                    About me
+                </h1>
+            </ParallaxLayer>
+            <ParallaxLayer
+                offset={0.09}
+                speed={2}
+                className="w-fit h-fit"
+                style={{
+                    marginLeft: "50%",
+                    zIndex: 2
+                }}
+                factor={0}
+            >
+                <h1 
+                    onClick={() => parallax.current.scrollTo(1)}
+                    className="w-fit h-fit transition-opacity duration-300 hover:opacity-50 cursor-pointer underline pt-8 text-viewport-2 font-semibold">
+                    Portfolio
+                </h1>
+            </ParallaxLayer>
+            <ParallaxLayer
+                offset={0.1}
+                speed={2.5}
+                className="w-fit h-fit"
+                style={{
+                    marginLeft: "80%",
+                    zIndex: 2
+                }}
+                factor={0}
+            >
+                <h1 
+                    onClick={() => parallax.current.scrollTo(3)}
+                    className="w-fit h-fit transition-opacity duration-300 hover:opacity-50 cursor-pointer underline pt-8 text-viewport-2 font-semibold">
+                    Contacts
+                </h1>
+            </ParallaxLayer> */}
             <ParallaxLayer
                 offset={0}
-                speed={0.1}
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                }}>
-                <div style={{ 
-                    display: "flex", 
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    alignItems: "center", 
-                }}>
-                    <h1 
-                        className="pt-8 text-center text-viewport-6 font-semibold">
-                        [🚧 website under construction 🚧]
-                    </h1>
-                </div>
+                speed={2}
+            >
+                <h1 
+                    className="block pt-8 text-center text-viewport-5 font-semibold">
+                    [🚧 website under construction 🚧]
+                </h1>
             </ParallaxLayer>
             <ParallaxLayer
                 offset={0}
