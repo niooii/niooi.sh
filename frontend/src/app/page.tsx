@@ -9,14 +9,11 @@ import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useMotionValue, motion, useTransform, useSpring } from "framer-motion"
+import CommitInfo from "@/components/version_info";
 
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
     const globalCanvasRef = useRef<HTMLCanvasElement>(null!);
-    const [screenWidthDiff, setScreenWidthDiff] = useState(0);
-    const [isClientReady, setIsClientReady] = useState(false);
-    const [mandelbrotWidth, setMandelbrotWidth] = useState(0);
-    const [mandelbrotHeight, setMandelbrotHeight] = useState(0);
     const parallax = useRef<IParallax>(null!)
 
     const scrollProgress = useMotionValue(0);
@@ -78,34 +75,34 @@ export default function Home() {
             yOffset: 1.37,
         },
         {
-          data: ProjectCategory.SYSTEMS_PROGRAMMING,
-          xOffset: 0.15,
-          yOffset: 1.7,
+            data: ProjectCategory.SYSTEMS_PROGRAMMING,
+            xOffset: 0.15,
+            yOffset: 1.7,
         },
         {
-          data: ProjectCategory.GAME_DEV,
-          xOffset: 0.3,
-          yOffset: 1.5,
+            data: ProjectCategory.GAME_DEV,
+            xOffset: 0.3,
+            yOffset: 1.5,
         },
         {
-          data: ProjectCategory.APP_DEV,
-          xOffset: 0.45,
-          yOffset: 1.4,
+            data: ProjectCategory.APP_DEV,
+            xOffset: 0.45,
+            yOffset: 1.4,
         },
         {
-          data: ProjectCategory.WEB_DEV,
-          xOffset: 0.6,
-          yOffset: 1.6,
+            data: ProjectCategory.WEB_DEV,
+            xOffset: 0.6,
+            yOffset: 1.6,
         },
         {
-          data: ProjectCategory.AI_ML,
-          xOffset: 0.75,
-          yOffset: 1.4,
+            data: ProjectCategory.AI_ML,
+            xOffset: 0.75,
+            yOffset: 1.4,
         },
         {
-          data: ProjectCategory.FUNCTIONAL,
-          xOffset: 0.85,
-          yOffset: 1.65,
+            data: ProjectCategory.FUNCTIONAL,
+            xOffset: 0.85,
+            yOffset: 1.65,
         },
         {
             data: BARRIER_ST,
@@ -123,23 +120,6 @@ export default function Home() {
     const starsBackMoveSpeed = 0.4;
     const starsBackOpacity = 0.4;
 
-    // useEffect(() => {
-    //     const width = Math.max(window.screen.availWidth, window.screen.height);
-
-    //     setMandelbrotWidth(width);
-    //     setMandelbrotHeight(width);
-
-    //     setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
-
-    //     setIsClientReady(true);
-
-    //     const onresize = () => {
-    //         setScreenWidthDiff(window.innerWidth - window.screen.availWidth);
-    //     };
-
-    //     addEventListener("resize", onresize);
-    //     return () => window.removeEventListener("resize", onresize);
-    // }, [])
     const handleScroll = () => {
         console.log("HEY world")
         const _scrollProgress = parallax.current.current / parallax.current.space
@@ -346,10 +326,11 @@ export default function Home() {
                 offset={0}
                 speed={2}
             >
-                <h1 
+                {/* <h1 
                     className="block pt-8 text-center text-viewport-5 font-semibold">
                     [🚧 website under construction 🚧]
-                </h1>
+                </h1> */}
+                <CommitInfo className="m-5 text-viewport-2" />
             </ParallaxLayer>
             <ParallaxLayer
                 offset={0}
