@@ -27,7 +27,8 @@ export enum ProjectCategory {
     APP_DEV = "Apps",
     DATA_SCIENCE = "Data Science",
     DEVOPS = "DevOps",
-    SECURITY = "Security"
+    SECURITY = "Security",
+    SPOOKY = "???"
 }
 
 export default interface Project {
@@ -56,10 +57,10 @@ export const IKEA_GAME: Project = {
 
 export const GDF: Project = {
     name: "GDF",
-    description: "Graphics framework and game built with Vulkan, C and C++",
-    summary: `The game you see here is written in C++, taking advantage of many of 
-    it's modern features. One of it's dependencies is a C library I am 
-    currently developing for cross platform, low level game development with vulkan.`,
+    description: "Graphics framework built for low level game development, paired with a game",
+    summary: `The game you see here is currently in development, written in C++. 
+    One of it's dependencies is a C library I am currently developing for
+     low level, cross platform game development with a focus on efficient rendering and customizability.`,
     categories: [ProjectCategory.SYSTEMS_PROGRAMMING, ProjectCategory.GAME_DEV],
     imageUrl: "projects/gdf.gif",
     usedTech: [Tech.C, Tech.CPP, Tech.VULKAN],
@@ -67,12 +68,12 @@ export const GDF: Project = {
 };
 
 export const JUPITER_ED: Project = {
-    name: "Grades Viewer",
-    description: "Mobile app for viewing school grades and assignments",
+    name: "Academic Summary App",
+    description: "Mobile app for viewing high school grades assignments, and more",
     summary: `An app I developed as an alternative to Jupiter Ed's web application,
-    which I found to be unintuitive, unhelpful and annoying at times. Spent a couple months  
+    designed to be more intuitive with many new quality of life features. Spent a couple months  
     poking around their backend, and creating a thin wrapper around it exposed as a REST api. 
-    The frontend was made by me and a friend. `,
+    The frontend was developed by a friend and I.`,
     categories: [ProjectCategory.APP_DEV, ProjectCategory.WEB_DEV],
     imageUrl: "projects/jupiter.gif",
     usedTech: [Tech.RUST, Tech.JAVA, Tech.FLUTTER],
@@ -123,10 +124,23 @@ export const NIOOI_SH: Project = {
 
 export const FLYING_HORSE: Project = {
     name: "Flying horse",
-    description: "A physics-y game in C++, built with SDL2",
-    summary: `My first ever non-trivial C++ program. `,
+    description: "A simulation/game in C++, built with SDL2",
+    summary: `My first non-trivial C++ program. Originally aimed to be a physics simulation but quickly 
+    spun off into a game about a flying horse trying to break free from captivity. The game is mostly a simulation, 
+    but you can activate the boss fight by pressing a certain key. The boss traps you in the window (yes, you as the user) until you either defeat him, 
+    or die.`,
     categories: [ProjectCategory.GAME_DEV],
-    imageUrl: "projects/placeholder.svg",
+    imageUrl: "projects/horse.gif",
     usedTech: [Tech.CPP],
     githubLink: "https://github.com/niooii/FLYING-HORSE"
+};
+
+export const BARRIER_ST: Project = {
+    name: "Barrier St.",
+    description: "...",
+    summary: `...`,
+    categories: [ProjectCategory.SPOOKY],
+    imageUrl: "projects/placeholder.svg",
+    usedTech: [Tech.PYTHON],
+    // githubLink: "https://github.com/niooii/FLYING-HORSE"
 };

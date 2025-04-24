@@ -4,7 +4,7 @@ import ProjectCard from "@/components/project_card";
 import ProjectsGraph, { ProjectGraphNode } from "@/components/projects_graph";
 import TimeCounter from "@/components/time_counter";
 import { FileSystem, Path } from "@/lib/filesystem";
-import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, NIOOI_SH, YOLO_CV } from "@/lib/project";
+import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, NIOOI_SH, YOLO_CV, BARRIER_ST } from "@/lib/project";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -106,6 +106,16 @@ export default function Home() {
           data: ProjectCategory.FUNCTIONAL,
           xOffset: 0.85,
           yOffset: 1.65,
+        },
+        {
+            data: BARRIER_ST,
+            xOffset: 0.3,
+            yOffset: 1.9,
+        },
+        {
+            data: ProjectCategory.SPOOKY,
+            xOffset: 0.4,
+            yOffset: 1.86,
         }
       ];
 

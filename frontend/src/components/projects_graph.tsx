@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { IParallax, ParallaxLayer } from "@react-spring/parallax";
 import Project, { ProjectCategory } from "@/lib/project";
 import ReactDOM from "react-dom";
+import { motion } from "framer-motion";
 
 export interface ProjectGraphNode {
     data: Project | ProjectCategory;
     xOffset: number;
     yOffset: number;
-    marginTop?: number
+    marginTop?: string
 }
 
 type NodePositions = Record<string, { x: number, y: number }>;
@@ -30,6 +31,21 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
         typeof node.data !== "string" ? `project-${(node.data as Project).name}` : `category-${node.data as ProjectCategory}`;
 
     const startTimeRef = useRef<number>(Date.now());
+
+    const container = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+      
+    const item = {
+        hidden: { opacity: 0 },
+        show: { opacity: 1 }
+    };
 
     // hack to preload all images
     useEffect(() => {
@@ -198,15 +214,13 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
 
     const renderPopup = () => {
         var project: Project | null = null;
-        if (lastHoveredNode)
-            project = lastHoveredNode.data as Project;
         
         var nodeId: string = "";
         var tooltipStyles;
 
-        if (hoveredNode) {
-            project = (hoveredNode?.data as Project);
-            nodeId = getNodeId(hoveredNode);
+        if (lastHoveredNode) {
+            project = (lastHoveredNode?.data as Project);
+            nodeId = getNodeId(lastHoveredNode);
             tooltipStyles = getTooltipPosition(nodeId);
         }
 
@@ -225,19 +239,20 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                     }}
                 />
                 
-                {/* The popup with details */}
                 <div 
-                    className="fixed inset-0 flex items-center z-50 transition-all duration-300"
+                    className="fixed inset-0 flex items-center z-50 transition-opacity duration-300"
                     style={{ 
                         opacity: hoveredNode ? 1 : 0,
                         pointerEvents: "none",
                     }}
                 >
-                    {hoveredNode && (
+                    {/* Tooltip thingy */}
+                    {lastHoveredNode && (
                         <p 
-                            className="font-semibold absolute transition-all text-viewport-[1.8] pointer-events-none"
+                            className="font-semibold absolute transition-opacity text-viewport-[1.8] pointer-events-none"
                             style={{ 
-                                opacity: lockedIn ? 0 : 1,
+                                // ah yes
+                                opacity: hoveredNode ? ((lockedIn) ? 0 : 1) : 0,
                                 ...tooltipStyles
                             }}
                         >
@@ -245,24 +260,21 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                         </p>
                     )}
 
-                    {(hoveredNode && nodeId && project) && (<div 
-                        className="rounded-2xl shadow-lg p-6 pointer-events-auto transition-all duration-300 ease-out"
+                    {/* Hover popup */}
+                    {(lastHoveredNode && nodeId && project) && (<div 
+                        className="rounded-2xl shadow-lg p-6 pointer-events-none transition-opacity duration-300 ease-out"
                         style={{
-                            backgroundColor: `rgb(9 9 11 / ${lockedIn ? 0.96 : 0.6})`,
-                            width: `${lockedIn ? 80 : 30}vw`,
-                            height: lockedIn ? "80vh" : "fit-content",
+                            backgroundColor: `rgb(9 9 11 / 0.6)`,
+                            width: `30vw`,
+                            opacity: hoveredNode ? ((lockedIn) ? 0 : 1) : 0,
+                            height: "fit-content",
                             position: "absolute",
                             top: 0,
                             bottom: 0,
                             margin: "auto",
-                            transform: lockedIn 
-                                ? "translate(-50%, 0)" 
-                                : `translate(0, 0)`,
-                            left: lockedIn 
-                                ? "50%" 
-                                : initialHoverSide?.left
-                                    ? `${nodePositions[nodeId]?.x + 50}px` 
-                                    : `${nodePositions[nodeId]?.x - 50 - (lockedIn ? 40 : 30) * window.innerWidth / 100}px`
+                            left: initialHoverSide?.left
+                                ? `${nodePositions[nodeId]?.x + 50}px` 
+                                : `${nodePositions[nodeId]?.x - 50 - 30 * window.innerWidth / 100}px`
                         }}
                     >
                         {project.imageUrl && (
@@ -293,6 +305,88 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                             style={{ opacity: lockedIn ? 1 : 0 }}
                         >[TODO: Summary, buttons, etc]</p>
                     </div>)}
+                    
+                    {/* Fullscreen details */}
+                    {(lastHoveredNode && nodeId && project) && (
+                    <div
+                        className="rounded-2xl shadow-lg p-6 transition-opacity duration-300 ease-out overflow-y-auto"
+                        style={{
+                            backgroundColor: `rgb(9 9 11 / 0.96)`,
+                            width: `80vw`,
+                            opacity: lockedIn ? 1 : 0,
+                            height: "80vh",
+                            position: "absolute",
+                            top: 0,
+                            bottom: 0,
+                            margin: "auto",
+                            transform: "translate(-50%, 0)",
+                            left: "50%",
+                            pointerEvents: lockedIn ? "auto" : "none"
+                        }}
+                    >
+                        <div className="flex flex-col items-center justify-center">
+                            {project.imageUrl && (
+                                <div className="mb-6 flex justify-center">
+                                    <img
+                                        src={project.imageUrl}
+                                        alt={project.name}
+                                        className="rounded-xl object-contain max-h-[40vh]"
+                                        style={{ width: 'auto', height: 'auto' }}
+                                    />
+                                </div>
+                            )}
+                        
+                            <h2 className="text-viewport-4 font-bold mb-2 text-center">{project.name}</h2>
+                        
+                            <p className="text-viewport-[2] italic mb-4 text-center max-w-2xl">{project.description}</p>
+                            
+                            {/* summary section */}
+                            {project.summary && (
+                                <div className="mb-6 max-w-3xl">
+                                    <p className="text-viewport-[1.8] leading-relaxed text-center sm:text-left">
+                                        {project.summary}
+                                    </p>
+                                </div>
+                            )}
+                            
+                            {/* tech stack */}
+                            {project.usedTech && project.usedTech.length > 0 && (
+                                <div className="mt-6">
+                                    <motion.div 
+                                        className="flex flex-wrap justify-center gap-4"
+                                        variants={container}
+                                        initial="hidden"
+                                        animate={lockedIn ? "show" : "hidden"}
+                                    >
+                                    {project.usedTech.map((tech) => (
+                                        <motion.div 
+                                            key={tech} 
+                                            className="flex flex-col items-center"
+                                            variants={item}
+                                        >
+                                        <div className="bg-zinc-800 rounded-lg p-3 flex items-center justify-center h-16 w-16">
+                                            <img 
+                                                src={`/icons/${tech.toLowerCase()}.svg`} 
+                                                alt={tech.replace(/_/g, ' ')} 
+                                                className="h-10 w-10 object-contain"
+                                            />
+                                        </div>
+                                        <span className="text-viewport-1 mt-1 opacity-80 font-bold">
+                                            {tech.replace(/_/g, ' ').toLowerCase().split(' ').map(
+                                            word => word.charAt(0).toUpperCase() + word.slice(1)
+                                            ).join(' ')}
+                                        </span>
+                                        </motion.div>
+                                    ))}
+                                    </motion.div>
+                                </div>
+                            )}
+                            <h1 className="mt-5 text-red-600">
+                            TODO: github link button 
+                            </h1>
+                        </div>
+                    </div>
+                )}
                 </div>
             </>,
             document.body
@@ -326,7 +420,7 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                         speed={Math.random() * 0.4 + 0.8}
                         style={{ 
                             pointerEvents: "none",
-                            transition: "opacity 0.3s ease"
+                            transition: "opacity 0.3s ease",
                         }}
                     >
                         <div 
@@ -334,7 +428,8 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                 position: "absolute",
                                 left: `${node.xOffset * 100}%`,
                                 transform: "translateX(-50%)",
-                                pointerEvents: "auto"
+                                pointerEvents: "auto",
+                                marginTop: node.marginTop ?? 0
                             }}
                         >
                             {isCategory ? (
@@ -368,7 +463,6 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                     onMouseLeave={() => {
                                         if (!lockedIn) {
                                             setHoveredNode(null);
-                                            setInitialHoverSide(null); 
                                         }
                                     }}
                                 >
