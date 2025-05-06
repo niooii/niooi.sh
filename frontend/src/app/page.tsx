@@ -4,7 +4,7 @@ import ProjectCard from "@/components/project_card";
 import ProjectsGraph, { ProjectGraphNode } from "@/components/projects_graph";
 import TimeCounter from "@/components/time_counter";
 import { FileSystem, Path } from "@/lib/filesystem";
-import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, NIOOI_SH, YOLO_CV, BARRIER_ST } from "@/lib/project";
+import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, OCLOUD, YOLO_CV, BARRIER_ST } from "@/lib/project";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -65,7 +65,7 @@ export default function Home() {
             yOffset: 1.8,
         },
         {
-            data: NIOOI_SH,
+            data: OCLOUD,
             xOffset: 0.66,
             yOffset: 1.8,
         },
@@ -352,7 +352,7 @@ export default function Home() {
                         className="pt-8 text-center text-viewport-10 font-semibold">
                         Hey, I'm Hewitt
                     </h1>
-                    <p className="text-viewport-3">I'm a CS + Math major, and I like making things</p>
+                    <p className="text-viewport-3">CS + Math major, I like making stuff</p>
                     <p className="text-viewport-2 text-gray-300">[click anywhere]</p>
                 </div>
             </ParallaxLayer>
@@ -387,7 +387,7 @@ export default function Home() {
                     {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
                     <h1 
                         className="text-center text-viewport-8 font-semibold">
-                        Some things I've worked on.
+                        I've done some things...
                     </h1>
                     <p className="text-viewport-2 text-gray-300">[Hover on a node]</p>
                 </div>
@@ -412,14 +412,13 @@ export default function Home() {
                     alignItems: "center",
                     justifyContent: "center",
                 }}>
-                {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
                 <h1 
                     className="text-center text-viewport-8 font-semibold"
                     style={{
                         marginTop: "-17%"
                     }}
                 >
-                    Player Summary
+                    Real things too...
                 </h1>
             </ParallaxLayer>
             <ParallaxLayer
@@ -438,7 +437,6 @@ export default function Home() {
                 style={{
                     zIndex: 1,
                 }}>
-                {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
                 <h1 
                     className="text-center text-viewport-3 font-semibold"
                 >
@@ -459,8 +457,9 @@ export default function Home() {
                 }}>
                 <h1 
                     className="text-center text-viewport-7 font-semibold">
-                    Need me for something?
+                    If you're still reading,
                 </h1>
+                <p>You either need me for something or you're very bored. Contact me!</p>
             </ParallaxLayer>
 
             <ParallaxLayer

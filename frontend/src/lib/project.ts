@@ -44,11 +44,11 @@ export default interface Project {
 
 /* Defining my projects here */
 export const IKEA_GAME: Project = {
-    name: "Procedural level generation",
-    description: "Level generator inspired by the wave function collapse algorithm",
+    name: "Procedural Level Generation",
+    description: "Level generator inspired by WFC algorithms",
     summary: `An attempt at implementing a 2d WFC algorithm in rust.
-    Used in conjunction with a unity project to generate infinite scenes in a
-    goofy, survival themed horror game.`,
+    Built and distributed as a dynamic library and used in a unity game to generate an infinite maze.  
+    Customizable with a JSON payload (questionable choice).`,
     categories: [ProjectCategory.GAME_DEV],
     imageUrl: "projects/procedural_gen.gif",
     usedTech: [Tech.RUST, Tech.CSHARP, Tech.UNITY],
@@ -57,9 +57,9 @@ export const IKEA_GAME: Project = {
 
 export const GDF: Project = {
     name: "GDF",
-    description: "Graphics framework built for low level game development, paired with a game",
-    summary: `The game you see here is currently in development, written in C++. 
-    One of it's dependencies is a C library I am currently developing for
+    description: "Multiplayer game built on a custom engine",
+    summary: `Originally started as a very ambitious final project for my game development class (it's been 2 years). 
+    The engine is being developed for
      low level, cross platform game development with a focus on efficient rendering and customizability.`,
     categories: [ProjectCategory.SYSTEMS_PROGRAMMING, ProjectCategory.GAME_DEV],
     imageUrl: "projects/gdf.gif",
@@ -68,7 +68,7 @@ export const GDF: Project = {
 };
 
 export const JUPITER_ED: Project = {
-    name: "Academic Summary App",
+    name: "Jupiter-Ed App",
     description: "Mobile app for viewing high school grades assignments, and more",
     summary: `An app I developed as an alternative to Jupiter Ed's web application,
     designed to be more intuitive with many new quality of life features. Spent a couple months  
@@ -81,9 +81,9 @@ export const JUPITER_ED: Project = {
 };
 
 export const YOLO_CV: Project = {
-    name: "Rover CV",
-    description: "Training YOLO models & building autonomous systems",
-    summary: ``,
+    name: "Autonomy and Computer Vision",
+    description: "Training YOLO models & building autonomous systems for a rover",
+    summary: `Python brings me so much pain`,
     categories: [ProjectCategory.AI_ML, ProjectCategory.APP_DEV],
     imageUrl: "projects/cv.gif",
     usedTech: [Tech.UNITY, Tech.PYTHON],
@@ -105,31 +105,30 @@ export const ONION_OS: Project = {
 export const MUSIC_LANG: Project = {
     name: "Music Language Compiler",
     description: "A language that \"compiles\" down to a .wav file",
-    summary: `...`,
+    summary: `My first introduction to functional parsing. Probably the thing that got me interested in category theory.`,
     categories: [ProjectCategory.FUNCTIONAL],
     imageUrl: "projects/placeholder.svg",
     usedTech: [Tech.HASKELL],
-    githubLink: "https://github.com/niooii/onion-os"
+    githubLink: "https://github.com/niooii/music-player"
 };
 
-export const NIOOI_SH: Project = {
-    name: "This Website",
-    description: "ahahah...",
-    summary: `...`,
+export const OCLOUD: Project = {
+    name: "ocloud",
+    description: "A convenient set of tools for a self-hosted cloud service.",
+    summary: `Infinite cloud storage for free! Except you pay for hard drives, possible hosting expenses, electricity, 
+    data loss and corruption... 
+    but at least you own your data`,
     categories: [ProjectCategory.WEB_DEV],
     imageUrl: "projects/placeholder.svg",
-    usedTech: [Tech.C],
-    githubLink: "https://github.com/niooii/niooi.sh"
+    usedTech: [Tech.RUST],
+    githubLink: "https://github.com/niooii/ocloud"
 };
 
 export const FLYING_HORSE: Project = {
     name: "Flying horse",
     description: "A simulation/game in C++, built with SDL2",
     summary: `My first non-trivial C++ program, and first introduction to many linear algebra & physics concepts.
-    Originally aimed to be a physics simulation but quickly 
-    spun off into a game about a flying horse trying to break free from captivity. The game is mostly a simulation, 
-    but you can activate the boss fight by pressing a certain key. The boss traps you in the window (yes, you as the user) until you either defeat him, 
-    or die.`,
+    What do you mean it's not good game design to trap the user inside your window until they win?`,
     categories: [ProjectCategory.GAME_DEV],
     imageUrl: "projects/horse.gif",
     usedTech: [Tech.CPP],
