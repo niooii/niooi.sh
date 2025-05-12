@@ -428,7 +428,8 @@ export default function Home() {
                 style={{
                     zIndex: 1,
                 }}>
-                <TimeCounter className="text-viewport-3 font-semibold block text-center" prefix="Total playtime: " from={new Date(2006, 5, 22)}></TimeCounter>
+                    <h1 className="text-viewport-3 font-semibold block text-center">WIP...</h1>
+                {/* <TimeCounter className="text-viewport-3 font-semibold block text-center" prefix="Total playtime: " from={new Date(2006, 5, 22)}></TimeCounter> */}
             </ParallaxLayer>
             <ParallaxLayer
                 offset={2.3}
