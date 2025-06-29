@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from "react";
 import { useMotionValue, motion, useTransform, useSpring, useMotionValueEvent } from "framer-motion"
 import CommitInfo from "@/components/version_info";
 import CategoryMenu from "@/components/category_menu";
-import SpinningSocialCircle from "@/components/SpinningSocialCircle";
 
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
