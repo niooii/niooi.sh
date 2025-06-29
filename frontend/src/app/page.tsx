@@ -8,8 +8,10 @@ import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, Project
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useMotionValue, motion, useTransform, useSpring } from "framer-motion"
+import { useMotionValue, motion, useTransform, useSpring, useMotionValueEvent } from "framer-motion"
 import CommitInfo from "@/components/version_info";
+import CategoryMenu from "@/components/category_menu";
+import SpinningSocialCircle from "@/components/SpinningSocialCircle";
 
 export default function Home() {
     const fsRef = useRef<FileSystem>(new FileSystem());
@@ -115,6 +117,19 @@ export default function Home() {
             yOffset: 1.86,
         }
       ];
+
+    // All projects array for the category menu
+    const allProjects = [
+        IKEA_GAME,
+        GDF,
+        JUPITER_ED,
+        YOLO_CV,
+        ONION_OS,
+        MUSIC_LANG,
+        OCLOUD,
+        FLYING_HORSE,
+        BARRIER_ST
+    ];
 
     const starsFrontMoveSpeed = 0.55;
     const starsBackMoveSpeed = 0.4;
@@ -370,7 +385,6 @@ export default function Home() {
             <ParallaxLayer
                 offset={1}
                 speed={0.1}
-                onClick={() => parallax.current.scrollTo(2)}
                 style={{
                     zIndex: 0,
                     display: "flex",
@@ -384,21 +398,33 @@ export default function Home() {
                     alignItems: "center",
                     justifyContent: "center",
                 }}>
-                    {/* <img src={"next.svg"} style={{ width: "40%" }} /> */}
                     <h1 
-                        className="text-center text-viewport-8 font-semibold">
+                        className="text-center text-viewport-8 font-semibold mb-8">
                         I've done some things...
                     </h1>
-                    <p className="text-viewport-2 text-gray-300">[Hover on a node]</p>
+                   
                 </div>
             </ParallaxLayer>
-            <div >
-                <ProjectsGraph 
-                    nodes={projectGraphNodes} 
-                    parallaxRef={parallax} 
-                    canvasRef={globalCanvasRef}
-                />
-            </div>
+
+            <ParallaxLayer
+                offset={1.4}
+                speed={1}
+                style={{
+                    zIndex: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}>
+                <div style={{ 
+                    marginTop: "-35%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}>
+            <CategoryMenu projects={allProjects} />
+                </div>
+            </ParallaxLayer>
 
             {/* Background and work history */}
             <ParallaxLayer
@@ -448,8 +474,7 @@ export default function Home() {
             {/* Socials */}
             <ParallaxLayer
                 offset={3}
-                speed={1}
-                onClick={() => parallax.current.scrollTo(0)}
+                speed={1.8}
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -457,10 +482,10 @@ export default function Home() {
                     flexDirection: "column"
                 }}>
                 <h1 
-                    className="text-center text-viewport-7 font-semibold">
+                    className="text-center text-viewport-7 font-semibold mt-8">
                     If you're still reading,
                 </h1>
-                <p>You either need me for something or you're very bored. Contact me!</p>
+                <p>You either need me for something or you're very bored. Reach out?</p>
             </ParallaxLayer>
 
             <ParallaxLayer
