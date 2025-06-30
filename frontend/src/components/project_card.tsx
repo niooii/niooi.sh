@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 interface ProjectCardProps {
   title: string;
   imageUrl: string;
+  videoUrl?: string;
   technologies?: string[];
   projectLink?: string;
   githubLink?: string;
@@ -12,6 +13,7 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({
   title,
   imageUrl,
+  videoUrl,
   technologies = [],
   projectLink,
   githubLink,
@@ -118,13 +120,24 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
       )}
       
-      {/* image/gif */}
+      {/* image/gif/video */}
       <div className="w-full rounded-lg overflow-hidden bg-gray-100">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
-        />
+        {videoUrl ? (
+          <video
+            src={videoUrl}
+            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
       </div>
       
       <div

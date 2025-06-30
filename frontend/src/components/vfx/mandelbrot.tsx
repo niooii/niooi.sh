@@ -1,5 +1,5 @@
 import { useSmoothMouse } from "@/hooks/smooth_mouse";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 // i wrote the mandelbrot stuff and time interpolation by myself but i 
 // asked genai to optimize it to hell i swear it was me for the most part though
@@ -19,16 +19,35 @@ uniform vec2 siteDimensions;
 uniform vec2 mousePos;
 uniform float time;
 uniform float zoom;
+uniform vec2 power; // powerReal, powerImag
+uniform vec2 center; // centerReal, centerImag
+uniform int maxIter;
 
 vec4 map_to_color(float t) {
-    vec3 color = vec3(
-        3.0 * (1.0 - t) * t * t * t, 
-        5.0 * (1.0 - t) * (1.0 - t) * t * t, 
-        15.0 * (1.0 - t) * (1.0 - t) * (1.0 - t) * t 
-    );
-    color.b = pow(color.b, 0.7);
-    float intensity = smoothstep(0.0, 0.3, t) * smoothstep(1.0, 0.7, t);
-    color *= intensity * 1.5;
+    vec3 color = vec3(0.0);
+    
+    float adjusted_t = pow(t, 0.7);
+    
+    if (adjusted_t < 0.2) {
+        color = vec3(0.2 + adjusted_t * 0.3, 0.0, 0.4 + adjusted_t * 0.6);
+    } else if (adjusted_t < 0.4) {
+        color = vec3(0.0, 0.3 * (adjusted_t - 0.2) / 0.2, 0.8 + 0.2 * (adjusted_t - 0.2) / 0.2);
+    } else if (adjusted_t < 0.6) {
+        color = vec3(0.0, 0.6 + 0.4 * (adjusted_t - 0.4) / 0.2, 0.8 - 0.3 * (adjusted_t - 0.4) / 0.2);
+    } else if (adjusted_t < 0.8) {
+        color = vec3(0.3 * (adjusted_t - 0.6) / 0.2, 0.8, 0.4 - 0.4 * (adjusted_t - 0.6) / 0.2);
+    } else {
+        float edge = (adjusted_t - 0.8) / 0.2;
+        color = vec3(0.6 + 0.4 * edge, 0.8 - 0.3 * edge, 0.2 - 0.2 * edge);
+    }
+    
+    color += vec3(0.1 * sin(adjusted_t * 10.0), 0.05 * cos(adjusted_t * 8.0), 0.1 * sin(adjusted_t * 12.0)) * 0.2;
+    
+    color *= 2.5;
+    
+    float intensity = smoothstep(0.0, 0.1, t) * smoothstep(1.0, 0.8, t);
+    color *= intensity * 1.8;
+    
     return vec4(color, 1.0);
 }
 
@@ -82,13 +101,13 @@ void main() {
   );
   
   vec2 c = vec2(
-    normMousePos.x / 8.0 + 0.14 + 0.02 * sinTime,
-    (-normMousePos.y / 10.0 + 0.725) + 0.02 * cosTime
+    normMousePos.x / 8.0 + center.x + 0.02 * sinTime,
+    (-normMousePos.y / 10.0 + center.y) + 0.02 * cosTime
   );
   
   vec2 x = vec2(
-    normMousePos.x / 4.0 + 1.7 + 0.01 * sinTime2,
-    0.1 + 0.01 * cosTime2
+    normMousePos.x / 4.0 + power.x + 0.01 * sinTime2,
+    power.y + 0.01 * cosTime2
   );
   
   vec2 z = pixel;
@@ -96,7 +115,7 @@ void main() {
   vec2 center = vec2(0.5) * canvasDimensions;
   float distFromCenter = length(gl_FragCoord.xy - center) / length(center);
   
-  int maxIter = 400;
+  int maxIter = maxIter;
   if (distFromCenter > 0.7) {
     maxIter = int(float(maxIter) * (1.0 - (distFromCenter - 0.7) * 0.6));
     maxIter = max(maxIter, 50); // Don"t go below 50 iterations
@@ -266,9 +285,33 @@ class WebGLResources {
 type MandelbrotProps = {
     width: number;
     height: number;
+    powerReal?: number;
+    powerImag?: number;
+    centerReal?: number;
+    centerImag?: number;
+    zoom?: number;
+    maxIterations?: number;
+    onParametersChange?: (params: {
+        powerReal: number;
+        powerImag: number;
+        centerReal: number;
+        centerImag: number;
+        zoom: number;
+        maxIterations: number;
+    }) => void;
 };
 
-const Mandelbrot = ({ width, height }: MandelbrotProps) => {
+const Mandelbrot = ({ 
+    width, 
+    height, 
+    powerReal = 1.7,
+    powerImag = 0.1,
+    centerReal = 0.14,
+    centerImag = 0.725,
+    zoom = 2,
+    maxIterations = 400,
+    onParametersChange
+}: MandelbrotProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGL2RenderingContext | null>(null);
     const resourcesRef = useRef<WebGLResources | null>(null);
@@ -320,6 +363,15 @@ const Mandelbrot = ({ width, height }: MandelbrotProps) => {
         const zoomLoc = gl.getUniformLocation(program, "zoom");
         gl.uniform1f(zoomLoc, 2);
         
+        const powerLoc = gl.getUniformLocation(program, "power");
+        gl.uniform2f(powerLoc, powerReal, powerImag);
+        
+        const centerLoc = gl.getUniformLocation(program, "center");
+        gl.uniform2f(centerLoc, centerReal, centerImag);
+        
+        const maxIterLoc = gl.getUniformLocation(program, "maxIter");
+        gl.uniform1i(maxIterLoc, maxIterations);
+        
         const render = (time: number) => {
             const gl = glRef.current;
             const resources = resourcesRef.current;
@@ -341,6 +393,18 @@ const Mandelbrot = ({ width, height }: MandelbrotProps) => {
             
             const mousePosLoc = gl.getUniformLocation(program, "mousePos");
             gl.uniform2fv(mousePosLoc, [mouse.current.x, mouse.current.y]);
+            
+            const zoomLoc = gl.getUniformLocation(program, "zoom");
+            gl.uniform1f(zoomLoc, zoom);
+            
+            const powerLoc = gl.getUniformLocation(program, "power");
+            gl.uniform2f(powerLoc, powerReal, powerImag);
+            
+            const centerLoc = gl.getUniformLocation(program, "center");
+            gl.uniform2f(centerLoc, centerReal, centerImag);
+            
+            const maxIterLoc = gl.getUniformLocation(program, "maxIter");
+            gl.uniform1i(maxIterLoc, maxIterations);
             
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             
@@ -378,7 +442,7 @@ const Mandelbrot = ({ width, height }: MandelbrotProps) => {
             
             window.removeEventListener("resize", handleResize);
         };
-    }, [width, height]); 
+    }, [width, height, powerReal, powerImag, centerReal, centerImag, zoom, maxIterations]);
   
     return (
         <canvas

@@ -8,7 +8,7 @@ interface CategoryMenuProps {
 }
 
 const ICONS_PATH = "/icons/";
-const PLACEHOLDER_IMAGES = ["projects/placeholder.svg", "", undefined, null];
+const PLACEHOLDER_IMAGES = ["", undefined, null];
 const ALL_CATEGORY = "All";
 
 const TRIANGLE_SIZE = 18;
@@ -76,7 +76,6 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
         return () => cancelAnimationFrame(raf);
     }, [gridKey]);
 
-    // Triangle position logic (X and Y) for initial mount and window resize
     useLayoutEffect(() => {
         const btn = buttonRefs.current[selectedCategory];
         const selector = selectorRef.current;
@@ -97,7 +96,8 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
 
     const categoryColors: Record<string, string> = {
         [ProjectCategory.SYSTEMS_PROGRAMMING]: "from-blue-500/20 to-cyan-500/20 border-blue-400/30",
-        [ProjectCategory.GAME_DEV]: "from-purple-500/20 to-pink-500/20 border-purple-400/30",
+        [ProjectCategory.GAMES]: "from-purple-500/20 to-pink-500/20 border-purple-400/30",
+        [ProjectCategory.GRAPHICS]: "from-blue-500/20 to-white-500/20 border-blue-400/30",
         [ProjectCategory.FUNCTIONAL]: "from-green-500/20 to-emerald-500/20 border-green-400/30",
         [ProjectCategory.AI_ML]: "from-orange-500/20 to-red-500/20 border-orange-400/30",
         [ProjectCategory.WEB_DEV]: "from-indigo-500/20 to-blue-500/20 border-indigo-400/30",
@@ -108,10 +108,12 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
         [ProjectCategory.SPOOKY]: "from-violet-500/20 to-purple-500/20 border-violet-400/30",
     };
 
-    // Helper to check if image is a placeholder
-    const isRealImage = (url?: string) => url && !PLACEHOLDER_IMAGES.includes(url);
+    const hasMedia = (project: Project) => {
+        const hasImage = project.imageUrl && !PLACEHOLDER_IMAGES.includes(project.imageUrl);
+        const hasVideo = project.videoUrl && project.videoUrl.trim() !== '';
+        return hasImage || hasVideo;
+    };
 
-    // For staggered animation: calculate row/col based on index and columns
     const getTransitionDelay = (idx: number, columns: number) => {
         const row = Math.floor(idx / columns);
         const col = idx % columns;
@@ -119,7 +121,6 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
         return (row * columns + col) * 60;
     };
 
-    // Responsive columns: match grid-cols-1, sm:grid-cols-2, md:grid-cols-3, lg:grid-cols-4, xl:grid-cols-5
     const getColumns = () => {
         if (typeof window === 'undefined') return 1;
         if (window.innerWidth >= 1280) return 5;
@@ -135,7 +136,6 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
-    // Layout: selector always at top, grid absolutely positioned below
     return (
         <div className={`w-full max-w-7xl px-4 mx-auto flex flex-col items-center relative ${className}`} style={{ minHeight: 500 }}>
             {/* Category Selector with Triangle Cursor */}
@@ -160,7 +160,6 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                         </button>
                     ))}
                 </div>
-                {/* Triangle cursor with Framer Motion */}
                 <motion.div
                     animate={{
                         x: trianglePos.left,
@@ -221,14 +220,25 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                                             marginRight: 'auto',
                                         }}
                                     >
-                                        {/* Project Image (only if real) */}
-                                        {isRealImage(project.imageUrl) && (
+                                        {/* Project Image/Video (only if real) */}
+                                        {hasMedia(project) && (
                                             <div className="relative h-48 overflow-hidden">
-                                                <img
-                                                    src={project.imageUrl}
-                                                    alt={project.name}
-                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                                />
+                                                {project.videoUrl ? (
+                                                    <video
+                                                        src={project.videoUrl}
+                                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                        autoPlay
+                                                        loop
+                                                        muted
+                                                        playsInline
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={project.imageUrl}
+                                                        alt={project.name}
+                                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                    />
+                                                )}
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                             </div>
                                         )}
@@ -297,7 +307,7 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                                                         rel="noopener noreferrer"
                                                         className="text-viewport-1 text-green-400 hover:text-green-300 transition-colors"
                                                     >
-                                                        Live Demo →
+                                                        Try It →
                                                     </a>
                                                 )}
                                             </div>

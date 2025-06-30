@@ -287,12 +287,24 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                                     alignItems: "center", 
                                 }}
                             >
-                                <img 
-                                    src={project.imageUrl} 
-                                    alt={project.name}
-                                    className="rounded-xl object-contain max-h-[50vh] max-w-[18vw]"
-                                    style={{ width: 'auto', height: 'auto' }}
-                                />
+                                {project.videoUrl ? (
+                                    <video 
+                                        src={project.videoUrl} 
+                                        className="rounded-xl object-contain max-h-[50vh] max-w-[18vw]"
+                                        style={{ width: 'auto', height: 'auto' }}
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                    />
+                                ) : (
+                                    <img 
+                                        src={project.imageUrl} 
+                                        alt={project.name}
+                                        className="rounded-xl object-contain max-h-[50vh] max-w-[18vw]"
+                                        style={{ width: 'auto', height: 'auto' }}
+                                    />
+                                )}
                             </div>
                         )}
                         
@@ -327,12 +339,24 @@ const ProjectGraph: React.FC<ProjectGraphProps> = ({ nodes, parallaxRef, canvasR
                         <div className="flex flex-col items-center justify-center">
                             {project.imageUrl && (
                                 <div className="mb-6 flex justify-center">
-                                    <img
-                                        src={project.imageUrl}
-                                        alt={project.name}
-                                        className="rounded-xl object-contain max-h-[40vh]"
-                                        style={{ width: 'auto', height: 'auto' }}
-                                    />
+                                    {project.videoUrl ? (
+                                        <video
+                                            src={project.videoUrl}
+                                            className="rounded-xl object-contain max-h-[40vh]"
+                                            style={{ width: 'auto', height: 'auto' }}
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                        />
+                                    ) : (
+                                        <img
+                                            src={project.imageUrl}
+                                            alt={project.name}
+                                            className="rounded-xl object-contain max-h-[40vh]"
+                                            style={{ width: 'auto', height: 'auto' }}
+                                        />
+                                    )}
                                 </div>
                             )}
                         

@@ -4,7 +4,7 @@ import ProjectCard from "@/components/project_card";
 import ProjectsGraph, { ProjectGraphNode } from "@/components/projects_graph";
 import TimeCounter from "@/components/time_counter";
 import { FileSystem, Path } from "@/lib/filesystem";
-import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, OCLOUD, YOLO_CV, BARRIER_ST } from "@/lib/project";
+import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, OCLOUD, YOLO_CV, BARRIER_ST, MANDELBULB_RENDER, JULIA_RENDER, DISCORD_USER, DISCORD_CLONER, SCORN, SHADER_APP } from "@/lib/project";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -34,100 +34,23 @@ export default function Home() {
         fs.makeDir(new Path("/notes"));
     }, []);
 
-    const projectGraphNodes: ProjectGraphNode[] = [
-        {
-            data: IKEA_GAME,
-            xOffset: 0.37,
-            yOffset: 1.34,
-        },
-        {
-            data: GDF,
-            xOffset: 0.3,
-            yOffset: 1.65,
-        },
-        {
-            data: JUPITER_ED,
-            xOffset: 0.5,
-            yOffset: 1.7,
-        },
-        {
-            data: YOLO_CV,
-            xOffset: 0.6,
-            yOffset: 1.3,
-        },
-        {
-            data: ONION_OS,
-            xOffset: 0.1,
-            yOffset: 1.4,
-        },
-        {
-            data: MUSIC_LANG,
-            xOffset: 0.8,
-            yOffset: 1.8,
-        },
-        {
-            data: OCLOUD,
-            xOffset: 0.66,
-            yOffset: 1.8,
-        },
-        {
-            data: FLYING_HORSE,
-            xOffset: 0.2,
-            yOffset: 1.37,
-        },
-        {
-            data: ProjectCategory.SYSTEMS_PROGRAMMING,
-            xOffset: 0.15,
-            yOffset: 1.7,
-        },
-        {
-            data: ProjectCategory.GAME_DEV,
-            xOffset: 0.3,
-            yOffset: 1.5,
-        },
-        {
-            data: ProjectCategory.APP_DEV,
-            xOffset: 0.45,
-            yOffset: 1.4,
-        },
-        {
-            data: ProjectCategory.WEB_DEV,
-            xOffset: 0.6,
-            yOffset: 1.6,
-        },
-        {
-            data: ProjectCategory.AI_ML,
-            xOffset: 0.75,
-            yOffset: 1.4,
-        },
-        {
-            data: ProjectCategory.FUNCTIONAL,
-            xOffset: 0.85,
-            yOffset: 1.65,
-        },
-        {
-            data: BARRIER_ST,
-            xOffset: 0.3,
-            yOffset: 1.9,
-        },
-        {
-            data: ProjectCategory.SPOOKY,
-            xOffset: 0.4,
-            yOffset: 1.86,
-        }
-      ];
-
     // All projects array for the category menu
     const allProjects = [
-        IKEA_GAME,
         GDF,
-        JUPITER_ED,
-        YOLO_CV,
-        ONION_OS,
-        MUSIC_LANG,
-        OCLOUD,
         FLYING_HORSE,
-        BARRIER_ST
+        SCORN,
+        IKEA_GAME,
+        YOLO_CV,
+        MANDELBULB_RENDER,
+        JULIA_RENDER,
+        SHADER_APP,
+        JUPITER_ED,
+        ONION_OS,
+        DISCORD_USER,
+        DISCORD_CLONER,
+        OCLOUD,
+        BARRIER_ST,
+        MUSIC_LANG,
     ];
 
     const starsFrontMoveSpeed = 0.55;
@@ -366,7 +289,7 @@ export default function Home() {
                         className="pt-8 text-center text-viewport-10 font-semibold">
                         Hey, I'm Hewitt
                     </h1>
-                    <p className="text-viewport-3">CS + Math major, I like making stuff</p>
+                    <p className="text-viewport-3">CS + Math major | I like making stuff</p>
                     <p className="text-viewport-2 text-gray-300">[click anywhere]</p>
                 </div>
             </ParallaxLayer>
@@ -383,7 +306,7 @@ export default function Home() {
             {/* Projects */}
             <ParallaxLayer
                 offset={1}
-                speed={0.1}
+                speed={1.8}
                 style={{
                     zIndex: 0,
                     display: "flex",
@@ -407,7 +330,7 @@ export default function Home() {
 
             <ParallaxLayer
                 offset={1.4}
-                speed={1}
+                speed={1.6}
                 style={{
                     zIndex: 0,
                     display: "flex",
@@ -415,13 +338,13 @@ export default function Home() {
                     justifyContent: "center",
                 }}>
                 <div style={{ 
-                    marginTop: "-35%",
+                    marginTop: "-45%",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                 }}>
-            <CategoryMenu projects={allProjects} />
+                <CategoryMenu projects={allProjects} />
                 </div>
             </ParallaxLayer>
 
