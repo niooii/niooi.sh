@@ -205,6 +205,7 @@ export const SHADER_APP: Project = {
     summary: `An introduction to raymarching and path tracing ideas. Took quite some tweaks to get it
      to work on mobile.`, 
     videoUrl: `projects/shader_app.mp4`,
+    githubLink: `https://github.com/niooii/AppDev/tree/main/FlutterProjects/shaders_project`,
     categories: [ProjectCategory.GRAPHICS, ProjectCategory.APP_DEV],
     usedTech: [Tech.FLUTTER],
 };
