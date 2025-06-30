@@ -204,6 +204,7 @@ export const SHADER_APP: Project = {
     description: "Having fun with SDFs and infinite tiled geometry",
     summary: `An introduction to raymarching and path tracing ideas. Took quite some tweaks to get it
      to work on mobile.`, 
+    videoUrl: `projects/shader_app.mp4`,
     categories: [ProjectCategory.GRAPHICS, ProjectCategory.APP_DEV],
     usedTech: [Tech.FLUTTER],
 };
