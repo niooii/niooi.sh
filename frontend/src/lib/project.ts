@@ -216,3 +216,15 @@ export const TRUMAN: Project = {
     usedTech: [Tech.RUST],
     githubLink: "https://github.com/niooii/discord-rs"
 };
+
+export const OSU: Project = {
+    name: "AI osu! player",
+    description: "Yes this is a neural network playing (kinda)",
+    summary: `Using a generative adversarial network to create human-like osu! play data, trained on a bunch of scraped replays. 
+    The goal is to mimic a human as much as possible, not really perfecting the game as that is pretty trivial, given
+    the nature of the game. RL soon?`,
+    categories: [ProjectCategory.AI_ML, ProjectCategory.GAMES],
+    usedTech: [Tech.PYTHON],
+    videoUrl: "projects/osusmall.mp4",
+    githubLink: "https://github.com/niooii/osu"
+}

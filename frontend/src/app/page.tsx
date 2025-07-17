@@ -4,7 +4,7 @@ import ProjectCard from "@/components/project_card";
 import ProjectsGraph, { ProjectGraphNode } from "@/components/projects_graph";
 import TimeCounter from "@/components/time_counter";
 import { FileSystem, Path } from "@/lib/filesystem";
-import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, OCLOUD, YOLO_CV, BARRIER_ST, MANDELBULB_RENDER, JULIA_RENDER, DISCORD_USER, DISCORD_CLONER, SCORN, SHADER_APP } from "@/lib/project";
+import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, ProjectCategory, Tech, OCLOUD, YOLO_CV, BARRIER_ST, MANDELBULB_RENDER, JULIA_RENDER, DISCORD_USER, DISCORD_CLONER, SCORN, SHADER_APP, OSU } from "@/lib/project";
 import { IParallax, Parallax, ParallaxLayer } from "@react-spring/parallax";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -40,6 +40,7 @@ export default function Home() {
         FLYING_HORSE,
         SCORN,
         IKEA_GAME,
+        OSU,
         YOLO_CV,
         MANDELBULB_RENDER,
         JULIA_RENDER,
