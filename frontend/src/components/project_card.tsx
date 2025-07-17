@@ -21,6 +21,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPortrait, setIsPortrait] = useState<boolean>(false);
   
   useEffect(() => {
@@ -47,6 +48,50 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoUrl) return;
+
+    const fadeAudio = (targetVolume: number, duration: number) => {
+      return new Promise<void>((resolve) => {
+        const startVolume = video.volume;
+        const volumeDiff = targetVolume - startVolume;
+        const steps = 30;
+        const stepTime = duration / steps;
+        const stepVolume = volumeDiff / steps;
+        let currentStep = 0;
+
+        const fadeInterval = setInterval(() => {
+          currentStep++;
+          video.volume = Math.max(0, Math.min(1, startVolume + (stepVolume * currentStep)));
+          
+          if (currentStep >= steps) {
+            clearInterval(fadeInterval);
+            video.volume = targetVolume;
+            resolve();
+          }
+        }, stepTime);
+      });
+    };
+
+    const handleAudioFade = async () => {
+      if (isHovered) {
+        try {
+          video.muted = false;
+          video.volume = 0;
+          await fadeAudio(0.3, 500);
+        } catch (error) {
+          console.log('Audio play failed - user interaction required');
+        }
+      } else {
+        await fadeAudio(0, 500);
+        video.muted = true;
+      }
+    };
+
+    handleAudioFade();
+  }, [isHovered, videoUrl]);
   
   const getTitleFontSize = () => {
     return width < 15 ? '0.85rem' : `clamp(1rem, ${width / 25}rem, 1.75rem)`;
@@ -124,6 +169,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       <div className="w-full rounded-lg overflow-hidden bg-gray-100">
         {videoUrl ? (
           <video
+            ref={videoRef}
             src={videoUrl}
             className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
             autoPlay

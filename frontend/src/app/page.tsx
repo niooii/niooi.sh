@@ -304,48 +304,29 @@ export default function Home() {
                 {/* <img className="rounded-md" src={"akaricough.png"} style={{ display: "block", width: "20%", marginLeft: "70%" , marginTop: "10%" }} /> */}
             </ParallaxLayer>
             
-            {/* Projects */}
+            {/* Portfolio Link */}
             <ParallaxLayer
                 offset={1}
-                speed={1.8}
+                speed={0.1}
+                onClick={() => parallax.current.scrollTo(2)}
                 style={{
-                    zIndex: 0,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                 }}>
                 <div style={{ 
-                    marginTop: "-35%",
-                    display: "flex",
+                    display: "flex", 
                     flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "space-between",
+                    alignItems: "center", 
                 }}>
                     <h1 
-                        className="text-center text-viewport-8 font-semibold mb-8">
+                        className="pt-8 text-center text-viewport-10 font-semibold">
                         I've done some things...
                     </h1>
-                   
-                </div>
-            </ParallaxLayer>
-
-            <ParallaxLayer
-                offset={1.4}
-                speed={1.6}
-                style={{
-                    zIndex: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}>
-                <div style={{ 
-                    marginTop: "-45%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}>
-                <CategoryMenu projects={allProjects} />
+                    <Link href="/portfolio" className="text-viewport-3 text-blue-400 underline hover:text-blue-300 transition-colors">
+                        Check out my portfolio
+                    </Link>
                 </div>
             </ParallaxLayer>
 
@@ -354,7 +335,7 @@ export default function Home() {
                 offset={2}
                 speed={2}
                 factor={0.5}
-                onClick={() => parallax.current.scrollTo(2.5)}
+                onClick={() => parallax.current.scrollTo(3)}
                 style={{
                     zIndex: 1,
                     display: "flex",
@@ -367,7 +348,7 @@ export default function Home() {
                         marginTop: "-17%"
                     }}
                 >
-                    Real things too...
+                    WIP
                 </h1>
             </ParallaxLayer>
             <ParallaxLayer
