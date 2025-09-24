@@ -1,6 +1,7 @@
 "use client"
 
 import CategoryMenu from "@/components/category_menu";
+import ShinyText from "@/components/ShinyText";
 import { FLYING_HORSE, GDF, IKEA_GAME, JUPITER_ED, MUSIC_LANG, ONION_OS, OCLOUD, YOLO_CV, BARRIER_ST, MANDELBULB_RENDER, JULIA_RENDER, DISCORD_USER, DISCORD_CLONER, SCORN, SHADER_APP, OSU } from "@/lib/project";
 
 export default function Portfolio() {
@@ -25,43 +26,23 @@ export default function Portfolio() {
     ];
 
     return (
-        <>
-            <style jsx global>{`
-                html, body {
-                    background: #1f2937 !important;
-                    min-height: 100%;
-                }
-            `}</style>
-            <div style={{ 
-                background: "#1f2937",
-                minHeight: "100vh",
-                width: "100vw",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "center",
-                padding: "2rem",
-                paddingBottom: "4rem"
-            }}>
-            <div style={{ 
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                maxWidth: "1200px"
-            }}>
-                <h1 className="text-center text-viewport-8 font-semibold mb-8 text-white">
-                    My Portfolio
-                </h1>
-                <h1 className="text-center text-viewport-3 font-semibold mb-8 text-white">
-                    i don't do web design could you tell
-                </h1>
+        <div className="relative min-h-screen w-full overflow-x-hidden">
+            {/* Header */}
+            <header className="relative mx-auto w-full max-w-7xl px-6 pt-16 pb-8 text-center">
+                <ShinyText
+                    text="Portfolio"
+                    className="text-viewport-9 font-semibold tracking-tight"
+                    speed={6}
+                />
+                <p className="mx-auto mt-3 max-w-3xl text-viewport-3 text-gray-300">
+                     Fun personal projects
+                </p>
+            </header>
+
+            {/* Content */}
+            <main className="relative mx-auto w-full max-w-7xl px-4 pb-16">
                 <CategoryMenu projects={allProjects} />
-            </div>
+            </main>
         </div>
-        </>
     );
 }

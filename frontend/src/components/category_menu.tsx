@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { motion } from "framer-motion";
+import { Cpu, Gamepad2, Image as ImageIcon, FunctionSquare, Brain, Globe2, Smartphone, Database, Settings, Shield, Ghost, MessageSquare } from "lucide-react";
 import Project, { ProjectCategory, Tech } from "@/lib/project";
 
 interface CategoryMenuProps {
@@ -11,17 +11,12 @@ const ICONS_PATH = "/icons/";
 const PLACEHOLDER_IMAGES = ["", undefined, null];
 const ALL_CATEGORY = "All";
 
-const TRIANGLE_SIZE = 18;
-
 const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
     const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY);
     const [cardsVisible, setCardsVisible] = useState(false);
     const [pendingCategory, setPendingCategory] = useState<string | null>(null);
     const [gridKey, setGridKey] = useState(ALL_CATEGORY);
     const fadeTimeout = useRef<NodeJS.Timeout | null>(null);
-    const selectorRef = useRef<HTMLDivElement>(null);
-    const [trianglePos, setTrianglePos] = useState<{ left: number, top: number }>({ left: 0, top: 0 });
-    const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
     // Get all unique categories from projects
     const categories = Array.from(new Set(
@@ -31,30 +26,17 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
     // Add 'All' at the start
     const displayCategories = [ALL_CATEGORY, ...categories];
 
-    // Filter projects by selected category
+    // Filter projects by selected category only
     const filteredProjects = selectedCategory === ALL_CATEGORY
         ? projects
         : projects.filter(project => project.categories.includes(selectedCategory as ProjectCategory));
 
-    // Smoother transition: fade out cards, then switch category, then fade in
     const handleCategoryClick = (category: string) => {
         if (category === selectedCategory) return;
-        // Move triangle instantly
-        const btn = buttonRefs.current[category];
-        const selector = selectorRef.current;
-        if (btn && selector) {
-            const btnRect = btn.getBoundingClientRect();
-            const selectorRect = selector.getBoundingClientRect();
-            setTrianglePos({
-                left: btnRect.left - selectorRect.left + btnRect.width / 2 - TRIANGLE_SIZE / 2,
-                top: btnRect.top - selectorRect.top - TRIANGLE_SIZE - 4 // 4px gap above button
-            });
-        }
         setCardsVisible(false);
         setPendingCategory(category);
     };
 
-    // Animation logic: always fade out before fade in, even on rapid switches
     useEffect(() => {
         if (pendingCategory !== null) {
             if (fadeTimeout.current) clearTimeout(fadeTimeout.current);
@@ -63,11 +45,10 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                 setGridKey(pendingCategory + '-' + Date.now()); // force grid re-mount for animation
                 setPendingCategory(null);
             }, 220); // match fade out duration
-            return () => fadeTimeout.current && clearTimeout(fadeTimeout.current);
+            return () => { if (fadeTimeout.current) clearTimeout(fadeTimeout.current); };
         }
     }, [pendingCategory]);
 
-    // Guarantee fade-in: set cardsVisible to true after DOM update
     useLayoutEffect(() => {
         setCardsVisible(false);
         const raf = requestAnimationFrame(() => {
@@ -76,18 +57,7 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
         return () => cancelAnimationFrame(raf);
     }, [gridKey]);
 
-    useLayoutEffect(() => {
-        const btn = buttonRefs.current[selectedCategory];
-        const selector = selectorRef.current;
-        if (btn && selector) {
-            const btnRect = btn.getBoundingClientRect();
-            const selectorRect = selector.getBoundingClientRect();
-            setTrianglePos({
-                left: btnRect.left - selectorRect.left + btnRect.width / 2 - TRIANGLE_SIZE / 2,
-                top: btnRect.top - selectorRect.top - TRIANGLE_SIZE - 4 // 4px gap above button
-            });
-        }
-    }, [selectedCategory, displayCategories.length]);
+    // triangle pointer removed
 
     // Clean up timeout on unmount
     useEffect(() => {
@@ -106,6 +76,26 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
         [ProjectCategory.DEVOPS]: "from-gray-500/20 to-slate-500/20 border-gray-400/30",
         [ProjectCategory.SECURITY]: "from-red-500/20 to-pink-500/20 border-red-400/30",
         [ProjectCategory.SPOOKY]: "from-violet-500/20 to-purple-500/20 border-violet-400/30",
+        [ProjectCategory.DISCORD_SHENANIGANS]: "from-blue-400/20 to-indigo-500/20 border-blue-400/30",
+    };
+
+    const CategoryIcon = ({ name }: { name: string }) => {
+        const cls = "mr-2 h-4 w-4 shrink-0 opacity-80";
+        switch (name) {
+            case ProjectCategory.SYSTEMS_PROGRAMMING: return <Cpu className={cls} />;
+            case ProjectCategory.GAMES: return <Gamepad2 className={cls} />;
+            case ProjectCategory.GRAPHICS: return <ImageIcon className={cls} />;
+            case ProjectCategory.FUNCTIONAL: return <FunctionSquare className={cls} />;
+            case ProjectCategory.AI_ML: return <Brain className={cls} />;
+            case ProjectCategory.WEB_DEV: return <Globe2 className={cls} />;
+            case ProjectCategory.APP_DEV: return <Smartphone className={cls} />;
+            case ProjectCategory.DATA_SCIENCE: return <Database className={cls} />;
+            case ProjectCategory.DEVOPS: return <Settings className={cls} />;
+            case ProjectCategory.SECURITY: return <Shield className={cls} />;
+            case ProjectCategory.SPOOKY: return <Ghost className={cls} />;
+            case ProjectCategory.DISCORD_SHENANIGANS: return <MessageSquare className={cls} />;
+            default: return null;
+        }
     };
 
     const hasMedia = (project: Project) => {
@@ -138,56 +128,38 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
 
     return (
         <div className={`w-full max-w-7xl px-4 mx-auto flex flex-col items-center relative ${className}`} style={{ minHeight: 500 }}>
-            {/* Category Selector with Triangle Cursor */}
-            <div className="relative w-full flex flex-col items-center" style={{ minHeight: 60 }}>
-                <div ref={selectorRef} className="flex flex-wrap justify-center gap-4 mb-4 z-10 relative w-full">
-                    {displayCategories.map((category) => (
-                        <button
-                            key={category}
-                            ref={el => { buttonRefs.current[category] = el; }}
-                            onClick={() => handleCategoryClick(category)}
-                            className={`
-                                px-6 py-3 rounded-lg border-2 transition-all duration-300
-                                backdrop-blur-sm bg-black/20
+            {/* Category Selector Bar (non-sticky) */}
+            <div className="w-full mb-6 md:mb-8">
+                <div className="relative w-full rounded-xl border border-white/10 bg-black/30 backdrop-blur px-4 py-3 shadow-sm">
+                    <div className="flex flex-col items-center gap-3 md:flex-row md:items-center md:justify-center">
+                        {/* Categories */}
+                        <div className="flex flex-wrap justify-center gap-2 md:gap-3 z-10 relative">
+                            {displayCategories.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => handleCategoryClick(category)}
+                                    className={`
+                                px-4 py-2 rounded-lg border transition-all duration-300
+                                bg-black/20
                                 ${selectedCategory === category 
-                                    ? (categoryColors[category] || 'border-gray-400/50') + ' shadow-lg shadow-current/20' 
+                                    ? (categoryColors[category] || 'border-gray-400/50') + ' ring-1 ring-white/10' 
                                     : 'border-gray-600/30 hover:border-gray-400/50 hover:bg-black/30'
                                 }
-                                text-viewport-2 font-medium
+                                text-viewport-2 font-medium whitespace-nowrap
                             `}
-                        >
-                            {category}
-                        </button>
-                    ))}
+                                    >
+                                        <span className="inline-flex items-center">
+                                            <CategoryIcon name={category} />
+                                            {category}
+                                        </span>
+                                    </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-                <motion.div
-                    animate={{
-                        x: trianglePos.left,
-                        y: trianglePos.top
-                    }}
-                    transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                        mass: 0.5
-                    }}
-                    style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        width: TRIANGLE_SIZE,
-                        height: TRIANGLE_SIZE,
-                        pointerEvents: 'none',
-                        zIndex: 20,
-                    }}
-                >
-                    <svg width={TRIANGLE_SIZE} height={TRIANGLE_SIZE} viewBox={`0 0 ${TRIANGLE_SIZE} ${TRIANGLE_SIZE}`} style={{ display: 'block' }}>
-                        <polygon points={`0,0 ${TRIANGLE_SIZE},0 ${TRIANGLE_SIZE/2},${TRIANGLE_SIZE}`} fill="#fff" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
-                    </svg>
-                </motion.div>
             </div>
 
-            {/* Projects Display (absolutely positioned, extends downward, min-height to prevent shifting) */}
+            {/* Projects Grid */}
             <div className="w-full relative" style={{ minHeight: 400 }}>
                 {selectedCategory && (
                     <div className="space-y-6 w-full absolute left-0 top-0">
@@ -209,7 +181,8 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                                             group relative overflow-hidden rounded-xl border-2
                                             backdrop-blur-sm bg-black/20
                                             ${colorClass}
-                                            transition-all duration-200
+                                            transition-all duration-200 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5
+                                            hover:ring-1 hover:ring-white/10
                                             ${cardsVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
                                         `}
                                         style={{
@@ -221,7 +194,7 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                                         }}
                                     >
                                         {/* Project Image/Video (only if real) */}
-                                        {hasMedia(project) && (
+                                        {hasMedia(project) ? (
                                             <div className="relative h-48 overflow-hidden">
                                                 {project.videoUrl ? (
                                                     <video
@@ -240,7 +213,17 @@ const CategoryMenu = ({ projects, className }: CategoryMenuProps) => {
                                                     />
                                                 )}
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                                {/* Category badges */}
+                                                <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+                                                    {project.categories?.slice(0, 2).map((c) => (
+                                                        <span key={c} className="rounded-full border border-white/15 bg-black/40 px-2 py-0.5 text-[10px] text-white/90 backdrop-blur">
+                                                            {c}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             </div>
+                                        ) : (
+                                            <div className="relative h-16 bg-gradient-to-br from-slate-800/50 to-slate-600/40" />
                                         )}
                                         {/* Project Content */}
                                         <div className="p-6">
